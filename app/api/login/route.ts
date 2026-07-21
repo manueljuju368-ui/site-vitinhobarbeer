@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';
+export async function POST(req:Request){const {password}=await req.json();if(!process.env.ADMIN_PASSWORD||password!==process.env.ADMIN_PASSWORD)return NextResponse.json({error:'Inválido'},{status:401});const r=NextResponse.json({ok:true});r.cookies.set('vitinho_admin',process.env.ADMIN_SESSION_SECRET!,{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production',maxAge:60*60*24*7,path:'/'});return r}

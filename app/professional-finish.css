@@ -1,0 +1,70 @@
+.teamGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 980px;
+  margin-inline: auto;
+}
+
+.noSlots {
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .section,
+  .bookingSection,
+  .portfolio,
+  .location {
+    padding-block: 64px;
+  }
+
+  .hero {
+    min-height: 680px;
+    height: 100svh;
+  }
+
+  .heroCopy {
+    padding-bottom: 20px;
+  }
+
+  .hero .actions {
+    gap: 10px;
+  }
+
+  .quick {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 8px 14px;
+  }
+
+  .quick span {
+    white-space: nowrap;
+  }
+
+  .sectionHead {
+    margin-bottom: 36px;
+  }
+
+  .barber {
+    min-height: 360px;
+    padding: 30px;
+  }
+
+  .bookingCard {
+    margin-top: 28px;
+  }
+
+  .choices button,
+  .times button,
+  .bookNav button,
+  .mobileBook {
+    touch-action: manipulation;
+  }
+
+  footer {
+    gap: 28px;
+  }
+}
