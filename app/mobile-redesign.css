@@ -1,0 +1,156 @@
+/* Mobile-first finishing layer. Kept isolated so desktop remains unchanged. */
+@media (max-width: 600px) {
+  :root { --mobile-gutter: 18px; }
+
+  body { background: #090a0b; }
+
+  header {
+    height: 66px;
+    padding: 0 var(--mobile-gutter);
+    background: rgba(7, 8, 9, .9);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  header .brand { grid-template-columns: 42px auto; grid-template-rows: 21px 11px; column-gap: 10px; }
+  header .brandmark { width: 42px; height: 42px; box-shadow: none; }
+  header .brand b { font-size: 19px; letter-spacing: 2px; }
+  header .brand small { font-size: 7px; letter-spacing: 4.5px; }
+
+  .hero {
+    height: auto;
+    min-height: 760px;
+    padding: 112px var(--mobile-gutter) 42px !important;
+    align-items: flex-end;
+    background-position: 60% center !important;
+  }
+  .heroShade {
+    background:
+      linear-gradient(180deg, rgba(5,6,7,.06) 20%, rgba(5,6,7,.62) 50%, #08090a 88%),
+      linear-gradient(90deg, rgba(5,6,7,.28), transparent 70%);
+  }
+  .heroCopy { width: 100%; padding: 0 !important; }
+  .eyebrow { font-size: 9px; letter-spacing: 2.4px; gap: 9px; }
+  .eyebrow span { width: 25px; }
+  .hero h1 {
+    max-width: 355px;
+    margin: 14px 0 16px;
+    font-size: clamp(42px, 12.2vw, 54px) !important;
+    line-height: .96;
+    letter-spacing: -1.2px;
+    overflow-wrap: normal;
+  }
+  .hero h1 em { display: block; margin-top: 4px; }
+  .hero p { max-width: 350px; margin: 0; font-size: 14px; line-height: 1.55; color: #d2d3d3; }
+  .hero .actions { display: grid; grid-template-columns: 1fr; gap: 9px; margin-top: 24px; }
+  .hero .btn { width: 100%; min-height: 52px; font-size: 11px; }
+  .hero .quick {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,.13);
+  }
+  .hero .quick span { min-width: 0; justify-content: center; gap: 4px; font-size: 6.5px; letter-spacing: .35px; text-align: center; white-space: normal; }
+  .hero .quick span:first-child { justify-content: flex-start; }
+  .hero .quick span:last-child { justify-content: flex-end; }
+  .hero .quick svg { width: 13px; }
+
+  .section, .portfolio, .bookingSection, .location { padding: 68px var(--mobile-gutter) !important; }
+  .sectionHead { margin-bottom: 28px; }
+  .sectionHead h2, .portfolio h2, .bookingIntro h2, .location h2 {
+    margin: 12px 0 0;
+    font-size: 39px;
+    line-height: 1;
+  }
+  .sectionHead h2 br, .portfolio h2 br, .bookingIntro h2 br { display: none; }
+  .sectionHead p { margin: 15px 0 0; font-size: 13px; line-height: 1.6; }
+  .kicker { font-size: 9px; letter-spacing: 2.3px; }
+
+  .serviceGrid { display: grid; gap: 10px; border: 0; }
+  .service {
+    grid-template-columns: 34px minmax(0,1fr) auto !important;
+    min-height: 98px;
+    padding: 17px 15px;
+    border: 1px solid #25282b;
+    border-radius: 8px;
+    background: linear-gradient(135deg,#141618,#0d0e0f);
+  }
+  .service:hover { padding-left: 15px; }
+  .service > span { align-self: start; padding-top: 4px; color: var(--gold); }
+  .service h3 { margin: 0 0 6px; font-size: 18px; line-height: 1.1; }
+  .service p { display: none; }
+  .service small { margin-top: 7px; font-size: 10px; }
+  .service strong { align-self: center; font-size: 17px; white-space: nowrap; }
+  .service > a { display: none; }
+
+  .team { background: #0d0f10; }
+  .teamGrid { gap: 12px; }
+  .teamGrid .barber { min-height: 0; padding: 22px; border-radius: 8px; }
+  .barber .avatar { width: 72px; height: 72px; margin: 0 0 22px; font-size: 25px; }
+  .barber h3 { margin: 7px 0; font-size: 24px; }
+  .barber p { margin: 0 0 18px; }
+
+  .portfolio { overflow: hidden; }
+  .portfolio > div:first-child p { font-size: 13px; line-height: 1.6; }
+  .portfolio > div:first-child .btn { width: 100%; margin-top: 8px; }
+  .portfolioShots {
+    display: flex;
+    gap: 11px;
+    width: auto;
+    margin: 32px calc(var(--mobile-gutter) * -1) 0 !important;
+    padding: 0 var(--mobile-gutter) 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .portfolioShots::-webkit-scrollbar { display: none; }
+  .portfolioShots .shot { flex: 0 0 78vw; aspect-ratio: .88; scroll-snap-align: center; border-radius: 8px; }
+  .shot figcaption { left: 16px; bottom: 15px; font-size: 8px; }
+
+  .bookingSection { background: #0d0f10; }
+  .bookingIntro ol { margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bookingIntro li { min-height: 70px; padding: 12px; border: 1px solid #272a2d; border-radius: 6px; display: block; }
+  .bookingIntro li b { display: block; margin-bottom: 7px; font-size: 10px; }
+  .bookingIntro li span { font-size: 11px; line-height: 1.35; }
+  .bookingCard { margin-top: 28px; padding: 19px; border-radius: 10px; box-shadow: 0 20px 55px #0008; }
+  .bookingCard h3 { font-size: 23px; }
+  .choices button { min-height: 58px; padding: 13px; }
+  .dateChoices { margin-right: -19px; padding-right: 19px; }
+  .times { gap: 7px; }
+  .times button { min-height: 44px; }
+  .bookNav .btn { min-height: 48px; }
+
+  .reviews { padding: 48px var(--mobile-gutter); gap: 18px; }
+  .reviews h2 { margin: 7px 0; font-size: 34px; }
+  .reviews p { font-size: 13px; }
+  .reviews .btn { width: 100%; background: #111; color: white; }
+
+  .location p { font-size: 13px; }
+  .location .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .location .btn { padding-inline: 10px; }
+  .location iframe { height: 280px; margin-top: 28px; border-radius: 8px; }
+
+  footer { padding: 52px var(--mobile-gutter) 118px; gap: 24px; font-size: 13px; }
+  footer .brand { width: max-content; }
+  footer > small { font-size: 10px; line-height: 1.5; }
+
+  .floatingWa { right: 14px; bottom: 77px; width: 48px; height: 48px; }
+  .floatingWa svg { width: 21px; }
+  .mobileBook {
+    left: 10px;
+    right: 10px;
+    bottom: 9px;
+    height: 54px;
+    border-radius: 7px;
+    box-shadow: 0 10px 35px #000c;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 370px) {
+  .hero h1 { font-size: 40px !important; }
+  .hero .quick span { font-size: 6.5px; }
+  .service { grid-template-columns: 28px minmax(0,1fr) auto !important; padding-inline: 12px; }
+  .service h3 { font-size: 16px; }
+  .service strong { font-size: 15px; }
+}
