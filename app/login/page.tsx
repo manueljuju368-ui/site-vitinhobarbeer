@@ -1,3 +1,66 @@
 'use client';
-import {useState} from 'react'; import {LockKeyhole,Scissors} from 'lucide-react';
-export default function Login(){const [password,setPassword]=useState(''),[error,setError]=useState(''),[loading,setLoading]=useState(false);async function submit(e:React.FormEvent){e.preventDefault();setLoading(true);setError('');const r=await fetch('/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password})});if(r.ok)location.href='/admin';else setError('Senha incorreta.');setLoading(false)}return <main className="loginPage"><form onSubmit={submit}><div className="loginLogo"><Scissors/></div><small>ÁREA RESTRITA</small><h1>Agenda Vitinho</h1><p>Entre para acompanhar os horários de hoje.</p><label>Senha de acesso<div><LockKeyhole/><input type="password" value={password} onChange={e=>setPassword(e.target.value)} autoFocus placeholder="Digite sua senha"/></div></label>{error&&<span className="loginError">{error}</span>}<button className="btn gold" disabled={loading}>{loading?'Entrando...':'Acessar agenda'}</button><a href="/">← Voltar ao site</a></form></main>}
+
+import {useState} from 'react';
+import {LockKeyhole} from 'lucide-react';
+import Link from 'next/link';
+import {BrandMark} from '@/components/Brand';
+
+export default function Login() {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({password}),
+      });
+      if (response.ok) {
+        location.href = '/admin';
+        return;
+      }
+      const data = await response.json().catch(() => ({}));
+      setError(data.error || 'Não foi possível entrar.');
+    } catch {
+      setError('Falha de conexão. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="loginPage">
+      <form onSubmit={submit}>
+        <div className="loginLogo"><BrandMark /></div>
+        <small>ÁREA RESTRITA</small>
+        <h1>Agenda Vitinho</h1>
+        <p>Entre para acompanhar os horários de hoje.</p>
+        <label>
+          Senha de acesso
+          <div>
+            <LockKeyhole />
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="current-password"
+              autoFocus
+              placeholder="Digite sua senha"
+            />
+          </div>
+        </label>
+        {error && <span className="loginError" role="alert">{error}</span>}
+        <button className="btn gold" disabled={loading || !password}>
+          {loading ? 'Entrando...' : 'Acessar agenda'}
+        </button>
+        <Link href="/">← Voltar ao site</Link>
+      </form>
+    </main>
+  );
+}

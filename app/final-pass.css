@@ -1,0 +1,638 @@
+/* Consolidated visual and responsive overrides. This file intentionally loads last. */
+:root {
+  --black: #08090a;
+  --panel: #111315;
+  --panel-strong: #17191b;
+  --line: #2b2e31;
+  --muted: #aeb0b4;
+  --gold: #dfb14e;
+  --gold-soft: #f0cb79;
+}
+
+html {
+  scroll-padding-top: 94px;
+}
+
+body {
+  min-width: 320px;
+  font-family: var(--font-manrope), Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+.service h3,
+.barber h3,
+.bookingCard h3,
+.brand b {
+  font-family: var(--font-oswald), Impact, sans-serif;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 3px;
+}
+
+.skipLink {
+  position: fixed;
+  z-index: 120;
+  top: 10px;
+  left: 10px;
+  padding: 12px 16px;
+  background: #fff;
+  color: #08090a;
+  font-size: 12px;
+  font-weight: 800;
+  transform: translateY(-150%);
+  transition: transform .2s;
+}
+
+.skipLink:focus {
+  transform: translateY(0);
+}
+
+.siteHeader {
+  height: 88px;
+  padding-inline: max(5vw, calc((100vw - 1320px) / 2));
+  border-bottom-color: rgba(255, 255, 255, .12);
+}
+
+.brand {
+  grid-template-columns: 54px auto;
+  grid-template-rows: 28px 14px;
+  column-gap: 13px;
+}
+
+.brandmark,
+header .brandmark,
+.barber.featured .avatar {
+  background: #08090a !important;
+  background-image: none !important;
+}
+
+.brandmark {
+  width: 54px;
+  height: 54px;
+  overflow: hidden;
+  border: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+
+.brandmark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.loginLogo {
+  overflow: hidden;
+  padding: 0;
+  background: #08090a;
+}
+
+.loginLogo img {
+  width: 100%;
+  height: 100%;
+}
+
+.brand b {
+  align-self: end;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: 2.5px;
+}
+
+.brand small {
+  align-self: start;
+  font-size: 8px;
+  letter-spacing: 5.8px;
+  line-height: 1;
+}
+
+.siteHeader nav a {
+  position: relative;
+  padding: 12px 0;
+}
+
+.siteHeader nav a::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 4px;
+  left: 0;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform .25s;
+}
+
+.siteHeader nav a:hover::after,
+.siteHeader nav a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.btn {
+  border-radius: 4px;
+}
+
+.btn.gold {
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  border-color: var(--gold);
+  box-shadow: 0 10px 32px rgba(223, 177, 78, .12);
+}
+
+.hero {
+  min-height: 720px;
+  height: min(820px, 100svh);
+  max-height: none;
+  padding-inline: max(7vw, calc((100vw - 1280px) / 2));
+  background: #08090a !important;
+}
+
+.heroMedia {
+  z-index: 0;
+  object-fit: cover;
+  object-position: center;
+}
+
+.heroShade {
+  z-index: 1;
+  background:
+    linear-gradient(90deg, #060708 3%, rgba(6, 7, 8, .93) 25%, rgba(6, 7, 8, .28) 64%, rgba(6, 7, 8, .08)),
+    linear-gradient(0deg, #08090a 0%, transparent 32%);
+}
+
+.heroCopy {
+  z-index: 2;
+}
+
+.hero h1 {
+  max-width: 720px;
+  font-size: clamp(60px, 6.3vw, 94px);
+  text-wrap: balance;
+}
+
+.hero p {
+  max-width: 520px;
+  color: #d4d5d6;
+}
+
+.quick {
+  color: #d7d8d9;
+}
+
+#conteudo {
+  scroll-margin-top: 88px;
+}
+
+#servicos,
+#equipe,
+#portfolio,
+#agendar,
+#local {
+  scroll-margin-top: 88px;
+}
+
+.section,
+.portfolio,
+.bookingSection,
+.location {
+  padding-inline: max(7vw, calc((100vw - 1280px) / 2));
+}
+
+.sectionHead p,
+.portfolio p,
+.barber p,
+.location p {
+  color: var(--muted);
+}
+
+.service {
+  border-color: rgba(255, 255, 255, .13);
+}
+
+.service > span {
+  color: #898c91;
+}
+
+.service strong {
+  white-space: nowrap;
+}
+
+.service > a {
+  border-radius: 50%;
+}
+
+.team {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(223, 177, 78, .06), transparent 34%),
+    #0d0f10;
+}
+
+.teamGrid {
+  max-width: 1040px;
+}
+
+.barber {
+  min-height: 390px;
+  border-radius: 12px;
+}
+
+.barber .avatar {
+  width: 112px;
+  height: 112px;
+  margin-bottom: 34px;
+  overflow: hidden;
+  background: #0c0d0e;
+  border-color: rgba(255, 255, 255, .2);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, .35);
+}
+
+.barber .avatar img {
+  width: 100%;
+  height: 100%;
+}
+
+.barber.featured .avatar {
+  font-size: 0;
+}
+
+.barber a {
+  width: max-content;
+}
+
+.shot {
+  border-radius: 10px;
+}
+
+.bookingSection {
+  gap: clamp(48px, 7vw, 110px);
+}
+
+.bookingCard {
+  overflow: visible;
+}
+
+.bookingProgress > div.active {
+  background: transparent;
+  color: #e9e9e6;
+  box-shadow: none;
+  transform: none;
+}
+
+.bookingProgress > div.active > span {
+  transform: scale(1.04);
+}
+
+.bookingProgress > div[aria-current="step"] > span {
+  box-shadow: 0 0 0 5px rgba(223, 177, 78, .1), 0 0 24px rgba(223, 177, 78, .3);
+}
+
+.choices button,
+.times button,
+.dateChoices button,
+.bookingCard input {
+  border-radius: 7px;
+}
+
+.choices small {
+  color: #9a9da1;
+}
+
+.choices button:hover,
+.times button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.bookingCard input {
+  min-height: 52px;
+  border-color: #34373a;
+}
+
+.bookingCard input[aria-invalid="true"] {
+  border-color: #ff7070;
+}
+
+.bookingError,
+.availabilityError {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 112, 112, .35);
+  border-radius: 7px;
+  background: rgba(88, 18, 22, .24);
+  color: #ffc5c5;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.availabilityError {
+  display: grid;
+  justify-items: start;
+}
+
+.availabilityError button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gold-soft);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.fieldHint {
+  display: block;
+  min-height: 17px;
+  margin: -12px 0 12px;
+  color: #ffaaaa;
+  font-size: 10px;
+}
+
+.developerCredit span {
+  color: #a0a2a6;
+}
+
+.floatingWa {
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .45);
+}
+
+@media (max-width: 900px) {
+  html {
+    scroll-padding-top: 74px;
+  }
+
+  .siteHeader {
+    height: 70px;
+    padding-inline: 18px;
+  }
+
+  .siteHeader .brand {
+    grid-template-columns: 44px auto;
+    grid-template-rows: 22px 11px;
+    column-gap: 10px;
+  }
+
+  .siteHeader .brandmark {
+    width: 44px;
+    height: 44px;
+  }
+
+  .siteHeader .brand b {
+    font-size: 20px;
+    letter-spacing: 2px;
+  }
+
+  .siteHeader .brand small {
+    font-size: 7px;
+    letter-spacing: 4.5px;
+  }
+
+  #servicos,
+  #equipe,
+  #portfolio,
+  #agendar,
+  #local {
+    scroll-margin-top: 70px;
+  }
+
+  .hero {
+    padding-top: 104px;
+  }
+
+  .floatingWa {
+    display: none;
+  }
+
+  .mobileBook {
+    left: 10px;
+    right: 10px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    height: 54px;
+    border-radius: 7px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .68);
+  }
+
+  footer {
+    padding-bottom: calc(105px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --mobile-gutter: 18px;
+  }
+
+  .hero {
+    min-height: 730px;
+    height: 100svh;
+    max-height: 860px;
+    padding: 106px var(--mobile-gutter) 76px !important;
+    background: #08090a !important;
+  }
+
+  .heroMedia {
+    object-position: 58% center;
+  }
+
+  .heroShade {
+    background:
+      linear-gradient(180deg, rgba(5, 6, 7, .08) 18%, rgba(5, 6, 7, .32) 38%, rgba(5, 6, 7, .9) 73%, #08090a 95%),
+      linear-gradient(90deg, rgba(5, 6, 7, .46), transparent 78%);
+  }
+
+  .hero h1 {
+    max-width: 360px;
+    margin-block: 13px;
+    font-size: clamp(42px, 12.2vw, 52px) !important;
+    line-height: .97;
+    letter-spacing: -1px;
+  }
+
+  .hero h1 em {
+    display: block;
+  }
+
+  .hero p {
+    max-width: 345px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .hero .actions {
+    margin-top: 22px;
+  }
+
+  .hero .quick {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    margin-top: 18px;
+    padding-top: 16px;
+  }
+
+  .hero .quick span,
+  .hero .quick span:first-child,
+  .hero .quick span:last-child {
+    min-width: 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 4px;
+    font-size: 7px;
+    line-height: 1.25;
+    letter-spacing: .35px;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .hero .quick svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .section,
+  .portfolio,
+  .bookingSection,
+  .location {
+    padding: 68px var(--mobile-gutter) !important;
+  }
+
+  .sectionHead h2,
+  .portfolio h2,
+  .bookingIntro h2,
+  .location h2 {
+    font-size: clamp(38px, 11vw, 44px);
+    line-height: .98;
+  }
+
+  .sectionHead h2 br,
+  .portfolio h2 br,
+  .bookingIntro h2 br {
+    display: block !important;
+  }
+
+  .sectionHead p {
+    margin-top: 17px;
+  }
+
+  .service {
+    border-color: #303337;
+  }
+
+  .teamGrid .barber {
+    min-height: 320px;
+    padding: 24px;
+  }
+
+  .barber .avatar {
+    width: 76px;
+    height: 76px;
+    margin: 0 0 24px;
+  }
+
+  .portfolioShots .shot {
+    flex-basis: min(82vw, 330px);
+  }
+
+  .bookingIntro ol {
+    margin-bottom: 0;
+  }
+
+  .bookingCard {
+    padding: 19px;
+    overflow: hidden;
+  }
+
+  .bookingHeader {
+    margin-bottom: 20px;
+  }
+
+  .bookingProgress {
+    margin-bottom: 26px;
+  }
+
+  .bookingProgress > div > span {
+    width: 34px;
+    height: 34px;
+  }
+
+  .choices {
+    max-height: 330px;
+  }
+
+  .choices button {
+    gap: 10px;
+  }
+
+  .dateChoices {
+    margin-right: -19px;
+    padding-right: 19px;
+  }
+
+  .times button {
+    min-height: 52px;
+  }
+
+  .bookNav {
+    position: sticky;
+    bottom: 0;
+    margin: 22px -19px -19px;
+    padding: 15px 19px 19px;
+    background: linear-gradient(0deg, #111315 78%, transparent);
+  }
+
+  .bookNav .btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .success {
+    min-height: 480px;
+  }
+
+  footer .brand {
+    grid-template-columns: 50px auto;
+  }
+}
+
+@media (max-width: 370px) {
+  .hero {
+    min-height: 700px;
+    padding-inline: 16px !important;
+  }
+
+  .hero h1 {
+    font-size: 39px !important;
+  }
+
+  .hero .quick span {
+    font-size: 6.5px;
+  }
+
+  .section,
+  .portfolio,
+  .bookingSection,
+  .location {
+    padding-inline: 16px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

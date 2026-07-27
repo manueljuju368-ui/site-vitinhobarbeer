@@ -1,1 +1,9 @@
-import type {MetadataRoute} from 'next'; export default function sitemap():MetadataRoute.Sitemap{return ['','/privacidade'].map(p=>({url:`https://vitinhobarber.com.br${p}`,lastModified:new Date()}))}
+import type {MetadataRoute} from 'next';
+import {siteUrl} from '@/lib/site';
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  return [
+    {url: siteUrl, changeFrequency: 'weekly' as const, priority: 1},
+    {url: `${siteUrl}/privacidade`, changeFrequency: 'yearly' as const, priority: 0.3},
+  ];
+}

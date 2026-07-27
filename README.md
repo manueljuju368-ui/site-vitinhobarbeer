@@ -1,23 +1,70 @@
 # Vitinho Barber
 
-Site responsivo em Next.js com agendamento, integração opcional com Supabase, painel administrativo, SEO local e confirmação pelo WhatsApp.
+Site comercial em Next.js com agenda online, integração com Supabase, confirmação pelo
+WhatsApp, painel administrativo e SEO local.
 
-## Rodar localmente
+## Desenvolvimento
 
-1. Instale Node.js 20 ou superior.
-2. Execute `npm install`.
-3. Copie `.env.example` para `.env.local` e preencha as chaves do Supabase.
-4. No SQL Editor do Supabase, execute `supabase/schema.sql`.
-5. Execute `npm run dev` e abra `http://localhost:3000`.
+Requisitos: Node.js 20.19 ou superior.
 
-Sem as variáveis do Supabase, o site abre normalmente em modo de apresentação e o fluxo finaliza no WhatsApp. Com o Supabase configurado, os dados são gravados no banco.
+```bash
+npm install
+npm run dev
+```
 
-## Antes de publicar
+O site abre em `http://localhost:3000`.
 
-**Confirme o endereço antes de publicar:** o material usado no projeto informa `Rua Emílio Muller, 27`, mas uma referência anterior do Google indicava `Av. Leopoldo Wasun, 140`. O site usa provisoriamente o endereço do material da barbearia. Atualize `lib/data.ts` e `business_settings` se necessário.
+## Qualidade
 
-Confirme os cadastros de Vitinho OFC e Pablo, substitua o hero derivado das referências pelas fotografias originais em alta resolução e crie o primeiro usuário administrativo.
+Antes de publicar, execute:
 
-## Segurança
+```bash
+npm run lint
+npm run typecheck
+npm run build
+npm run test:e2e
+npm audit
+```
 
-O SQL ativa RLS nas tabelas sensíveis e inclui uma restrição PostgreSQL que impede sobreposição de horários para o mesmo barbeiro. Em produção, a criação pública de agendamentos deve passar por uma Server Action/RPC com rate limit e validação transacional; nunca exponha a service role no navegador.
+Os testes cobrem desktop, celular, fluxo de agenda, indisponibilidade da API, serviços
+sob consulta, proteção do painel e comunicação com o banco.
+
+## Configuração obrigatória de produção
+
+Copie `.env.example` para o ambiente da hospedagem e configure:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_SCHEMA_READY=true`
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET` com pelo menos 32 caracteres aleatórios
+- `NEXT_PUBLIC_SITE_URL` com o domínio público em HTTPS
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, quando o Search Console estiver disponível
+
+Execute `supabase/schema.sql` no banco antes de habilitar `SUPABASE_SCHEMA_READY`.
+Em produção, uma configuração incompleta faz a agenda retornar indisponibilidade; ela
+não confirma reservas temporárias em memória.
+
+## Regras do agendamento
+
+- Reservas são aceitas com no mínimo uma hora de antecedência.
+- A agenda pública exibe os próximos 14 dias úteis dentro de uma janela de 21 dias.
+- Pigmentação, luzes e platinado são enviados para consulta pelo WhatsApp porque a
+  duração depende de avaliação.
+- O painel permite consultar qualquer data e atualizar o estado do atendimento.
+- A restrição do PostgreSQL impede sobreposição para o mesmo profissional.
+
+## Antes de apontar o domínio
+
+Confirme diretamente com a barbearia:
+
+- endereço exibido: `Rua Emílio Muller, 27, Santos Dumont, São Leopoldo – RS`;
+- WhatsApp: `+55 51 98971-9243`;
+- horários de Vitinho OFC e Pablo;
+- preços e disponibilidade dos serviços;
+- direito de uso das fotografias publicadas.
+
+O domínio configurado no código é `vitinhobarber.com.br`. Ele precisa estar registrado,
+com DNS ativo e apontado para a hospedagem. Configure o mesmo endereço em
+`NEXT_PUBLIC_SITE_URL` antes do build final.

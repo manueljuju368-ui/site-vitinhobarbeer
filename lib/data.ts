@@ -9,5 +9,24 @@ export const services = [
   {id:'luzes',name:'Luzes',price:140,duration:null,desc:'Técnica e tonalidade personalizadas.'},
   {id:'platinado',name:'Platinado',price:140,duration:null,desc:'Transformação completa com acabamento profissional.'}
 ];
+export const bookableServices = services.filter(
+  (service): service is typeof service & {duration: number} => service.duration !== null,
+);
+export const barbers = [
+  {
+    name: 'Vitinho OFC',
+    firstName: 'Vitinho',
+    initials: 'VB',
+    note: 'Cortes modernos e transformações',
+    description: 'Cortes atuais, degradês e transformações com acabamento preciso.',
+  },
+  {
+    name: 'Pablo',
+    firstName: 'Pablo',
+    initials: 'P',
+    note: 'Corte personalizado e acabamento preciso',
+    description: 'Atendimento personalizado para deixar cada detalhe alinhado ao seu estilo.',
+  },
+];
 export const whatsapp='5551989719243';
 export const address='Rua Emílio Muller, 27, Santos Dumont, São Leopoldo – RS';

@@ -1,104 +1,287 @@
 import {
   ArrowRight,
+  BadgeCheck,
+  CalendarCheck,
   CalendarDays,
   Clock3,
   Instagram,
   MapPin,
   MessageCircle,
   Scissors,
+  Sparkles,
   Star,
   Users,
 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import Brand, {BrandMark} from '@/components/Brand';
 import Booking from '@/components/Booking';
-import {address, services, whatsapp} from '@/lib/data';
+import {address, barbers, services, whatsapp} from '@/lib/data';
+import {
+  googleMapsUrl,
+  googleReviewUrl,
+  instagramUrl,
+  whatsappLink,
+} from '@/lib/site';
 
-const whatsappUrl = `https://wa.me/${whatsapp}`;
-const instagramUrl = 'https://instagram.com/vitinhobarber_ofc';
-const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+const generalWhatsappUrl = whatsappLink(
+  whatsapp,
+  'Olá! Vim pelo site da Vitinho Barber e gostaria de tirar uma dúvida.',
+);
+const consultationUrl = whatsappLink(
+  whatsapp,
+  'Olá! Vim pelo site e gostaria de consultar um horário para pigmentação, luzes ou platinado.',
+);
+const mapsUrl = googleMapsUrl(address);
+
+const portfolio = [
+  {
+    src: '/corte-luzes-v2.webp',
+    title: 'Luzes e textura',
+    alt: 'Corte masculino com luzes realizado na Vitinho Barber',
+  },
+  {
+    src: '/corte-degrade-v2.webp',
+    title: 'Degradê e freestyle',
+    alt: 'Corte degradê com risco realizado na Vitinho Barber',
+  },
+  {
+    src: '/corte-platinado-v2.webp',
+    title: 'Platinado',
+    alt: 'Corte platinado realizado na Vitinho Barber',
+  },
+];
 
 export default function Home() {
   return (
     <main>
-      <header>
-        <a className="brand" href="#inicio" aria-label="Vitinho Barber — início">
-          <span className="brandmark"><Scissors /></span><b>VITINHO</b><small>BARBER</small>
-        </a>
+      <a className="skipLink" href="#conteudo">Pular para o conteúdo</a>
+
+      <header className="siteHeader">
+        <Brand />
         <nav aria-label="Navegação principal">
-          <a href="#servicos">Serviços</a><a href="#equipe">Equipe</a><a href="#portfolio">Trabalhos</a><a href="#local">Endereço</a>
+          <a href="#agendar">Agenda</a>
+          <a href="#servicos">Serviços</a>
+          <a href="#portfolio">Trabalhos</a>
+          <a href="#equipe">Equipe</a>
+          <a href="#local">Endereço</a>
         </nav>
-        <a className="btn gold" href="#agendar">Agendar horário</a>
+        <a className="btn gold headerCta" href="#agendar">
+          <CalendarDays /> Agendar horário
+        </a>
       </header>
 
-      <section className="hero" id="inicio">
+      <section className="hero" id="inicio" aria-labelledby="hero-title">
+        <Image
+          className="heroMedia"
+          src="/hero-campaign-v2.webp"
+          alt=""
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+        />
+        <div className="heroShade" />
         <div className="heroCopy">
           <div className="eyebrow"><span /> SÃO LEOPOLDO • RS</div>
-          <h1>Corte, barba e acabamento <em>do seu jeito.</em></h1>
-          <p>Consulte os horários disponíveis e marque seu atendimento com Vitinho ou Pablo.</p>
+          <h1 id="hero-title">Seu próximo corte <em>começa aqui.</em></h1>
+          <p>
+            Escolha o serviço, veja os horários livres e marque com Vitinho ou Pablo
+            em poucos passos.
+          </p>
           <div className="actions">
-            <a className="btn gold" href="#agendar">Ver horários <ArrowRight /></a>
-            <a className="btn ghost" href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle /> Chamar no WhatsApp</a>
+            <a className="btn gold heroPrimary" href="#agendar">
+              Escolher meu horário <ArrowRight />
+            </a>
+            <a className="btn ghost" href="#portfolio">
+              <Sparkles /> Ver trabalhos reais
+            </a>
           </div>
-          <div className="quick">
-            <span><Clock3 />Seg–sáb</span><span><Users />2 barbeiros</span><span><MapPin />Santos Dumont</span>
+          <div className="heroProof" aria-label="Informações rápidas">
+            <span><CalendarCheck /><b>Agenda online</b><small>Consulte em tempo real</small></span>
+            <span><Users /><b>2 profissionais</b><small>Escolha quem atende</small></span>
+            <span><Scissors /><b>A partir de R$ 15</b><small>Valores transparentes</small></span>
           </div>
         </div>
-        <div className="heroShade" />
+        <a className="heroReview" href={googleReviewUrl} target="_blank" rel="noreferrer">
+          <Star />
+          <span><b>Já é cliente?</b><small>Avalie a barbearia no Google</small></span>
+          <ArrowRight />
+        </a>
       </section>
 
-      <section id="servicos" className="section">
+      <div id="conteudo" />
+
+      <section className="valueStrip" aria-label="Vantagens do agendamento">
+        <article><CalendarCheck /><span><b>Você escolhe</b><small>Dia, horário e profissional</small></span></article>
+        <article><BadgeCheck /><span><b>Sem surpresa</b><small>Preço informado antes de marcar</small></span></article>
+        <article><MessageCircle /><span><b>Contato direto</b><small>Confirmação pelo WhatsApp</small></span></article>
+      </section>
+
+      <section id="agendar" className="bookingSection conversionSection" aria-labelledby="booking-title">
+        <div className="bookingIntro">
+          <span className="kicker">AGENDE AGORA</span>
+          <h2 id="booking-title">Garanta seu<br /><em>horário.</em></h2>
+          <p>
+            A agenda mostra apenas os horários disponíveis. Escolha com calma e envie
+            seus dados para a equipe confirmar.
+          </p>
+          <ol>
+            <li><b>01</b><span>Escolha o serviço</span></li>
+            <li><b>02</b><span>Escolha o barbeiro</span></li>
+            <li><b>03</b><span>Selecione dia e horário</span></li>
+            <li><b>04</b><span>Informe nome e WhatsApp</span></li>
+          </ol>
+          <div className="bookingHelp">
+            <MessageCircle />
+            <span><b>Prefere falar com alguém?</b><small>A equipe responde direto no WhatsApp.</small></span>
+            <a href={generalWhatsappUrl} target="_blank" rel="noreferrer">Chamar</a>
+          </div>
+        </div>
+        <Booking />
+      </section>
+
+      <section id="servicos" className="section servicesSection" aria-labelledby="services-title">
         <div className="sectionHead">
-          <div><span className="kicker">SERVIÇOS E VALORES</span><h2>Escolha seu<br /><em>atendimento.</em></h2></div>
-          <p>Valores e tempo estimado para você se organizar antes de marcar.</p>
+          <div>
+            <span className="kicker">SERVIÇOS E VALORES</span>
+            <h2 id="services-title">Escolha o seu<br /><em>atendimento.</em></h2>
+          </div>
+          <p>
+            Valores claros para você decidir antes de marcar. Serviços técnicos são
+            combinados diretamente com a equipe.
+          </p>
         </div>
         <div className="serviceGrid">
-          {services.map((service, index) => (
-            <article className="service" key={service.id}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <div><h3>{service.name}</h3><p>{service.desc}</p><small><Clock3 /> {service.duration ? `${service.duration} min` : 'Tempo sob consulta'}</small></div>
-              <strong>R$ {service.price.toFixed(2).replace('.', ',')}</strong>
-              <a href="#agendar" aria-label={`Agendar ${service.name}`}><ArrowRight /></a>
+          {services.map((service, index) => {
+            const bookable = service.duration !== null;
+            const href = bookable ? '#agendar' : consultationUrl;
+            return (
+              <article className="service" key={service.id}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3>{service.name}</h3>
+                  <p>{service.desc}</p>
+                  <small>
+                    <Clock3 />
+                    {bookable ? `${service.duration} min` : 'Duração sob consulta'}
+                  </small>
+                </div>
+                <strong>R$ {service.price.toFixed(2).replace('.', ',')}</strong>
+                <a
+                  href={href}
+                  target={bookable ? undefined : '_blank'}
+                  rel={bookable ? undefined : 'noreferrer'}
+                  aria-label={bookable ? `Agendar ${service.name}` : `Consultar ${service.name} no WhatsApp`}
+                >
+                  {bookable ? <ArrowRight /> : <MessageCircle />}
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section id="portfolio" className="portfolio portfolioV2" aria-labelledby="portfolio-title">
+        <div className="portfolioCopy">
+          <span className="kicker">TRABALHOS REAIS</span>
+          <h2 id="portfolio-title">Resultado que<br /><em>fala por si.</em></h2>
+          <p>
+            Cortes realizados na Vitinho Barber. Veja mais transformações e novidades
+            no perfil oficial.
+          </p>
+          <a className="btn ghost" href={instagramUrl} target="_blank" rel="noreferrer">
+            <Instagram /> @vitinhobarber_ofc
+          </a>
+        </div>
+        <div className="portfolioGallery">
+          {portfolio.map((image, index) => (
+            <figure className={index === 1 ? 'featuredShot' : ''} key={image.src}>
+              <Image src={image.src} alt={image.alt} fill sizes="(max-width: 900px) 88vw, 24vw" />
+              <figcaption><span>0{index + 1}</span>{image.title}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section id="equipe" className="section team" aria-labelledby="team-title">
+        <div className="sectionHead">
+          <div>
+            <span className="kicker">QUEM ATENDE</span>
+            <h2 id="team-title">Seu estilo,<br /><em>sua escolha.</em></h2>
+          </div>
+          <p>Selecione o profissional no agendamento e consulte a disponibilidade.</p>
+        </div>
+        <div className="teamGrid">
+          {barbers.map((barber, index) => (
+            <article className={`barber ${index === 0 ? 'featured' : ''}`} key={barber.name}>
+              <div className="avatar" aria-hidden="true">{index === 0 ? <BrandMark /> : barber.initials}</div>
+              <span>BARBEIRO</span>
+              <h3>{barber.name}</h3>
+              <p>{barber.description}</p>
+              <a href="#agendar">Ver agenda do {barber.firstName} <ArrowRight /></a>
             </article>
           ))}
         </div>
       </section>
 
-      <section id="equipe" className="section team">
-        <div className="sectionHead">
-          <div><span className="kicker">QUEM ATENDE</span><h2>Escolha seu<br /><em>barbeiro.</em></h2></div>
-          <p>Você escolhe o profissional durante o agendamento.</p>
+      <section className="reviews">
+        <Star />
+        <div>
+          <span className="kicker">SUA EXPERIÊNCIA CONTA</span>
+          <h2>Já foi atendido?</h2>
+          <p>Uma avaliação ajuda outras pessoas a conhecerem o nosso trabalho.</p>
         </div>
-        <div className="teamGrid">
-          <article className="barber featured"><div className="avatar">VB</div><span>BARBEIRO</span><h3>Vitinho OFC</h3><p>Consulte a agenda e escolha o melhor horário para o seu atendimento.</p><a href="#agendar">Ver agenda do Vitinho <ArrowRight /></a></article>
-          <article className="barber"><div className="avatar">P</div><span>BARBEIRO</span><h3>Pablo</h3><p>Consulte a agenda e escolha o melhor horário para o seu atendimento.</p><a href="#agendar">Ver agenda do Pablo <ArrowRight /></a></article>
+        <a className="btn ghost" href={googleReviewUrl} target="_blank" rel="noreferrer">
+          Avaliar no Google
+        </a>
+      </section>
+
+      <section id="local" className="location" aria-labelledby="location-title">
+        <div>
+          <span className="kicker">ENDEREÇO E HORÁRIOS</span>
+          <h2 id="location-title">Vitinho Barber</h2>
+          <p><MapPin /> {address}</p>
+          <p><Clock3 /> Segunda: 14h–20h<br />Terça a sábado: 9h–20h<br />Domingo: fechado</p>
+          <div className="actions">
+            <a className="btn gold" href={mapsUrl} target="_blank" rel="noreferrer">Abrir no mapa</a>
+            <a className="btn ghost" href={generalWhatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a>
+          </div>
         </div>
-      </section>
-
-      <section id="portfolio" className="portfolio">
-        <div><span className="kicker">TRABALHOS DA BARBEARIA</span><h2>Veja alguns<br /><em>cortes recentes.</em></h2><p>Fotos de atendimentos da Vitinho Barber. O trabalho completo está no Instagram.</p><a className="btn ghost" href={instagramUrl} target="_blank" rel="noreferrer"><Instagram /> @vitinhobarber_ofc</a></div>
-        <div className="portfolioShots"><figure className="shot shotOne"><figcaption>Acabamento</figcaption></figure><figure className="shot shotTwo"><figcaption>Degradê e freestyle</figcaption></figure><figure className="shot shotThree"><figcaption>Desenho</figcaption></figure></div>
-      </section>
-
-      <section id="agendar" className="bookingSection">
-        <div className="bookingIntro"><span className="kicker">AGENDAMENTO ONLINE</span><h2>Marque em<br /><em>poucos passos.</em></h2><ol><li><b>01</b><span>Escolha o serviço</span></li><li><b>02</b><span>Escolha o barbeiro</span></li><li><b>03</b><span>Selecione dia e horário</span></li><li><b>04</b><span>Informe seus dados</span></li></ol></div>
-        <Booking />
-      </section>
-
-      <section className="reviews"><Star /><div><span className="kicker">AVALIAÇÕES</span><h2>Já foi atendido?</h2><p>Conte como foi sua experiência na barbearia.</p></div><a className="btn ghost" href="https://www.google.com/search?q=Vitinhobarber_ofc+São+Leopoldo" target="_blank" rel="noreferrer">Avaliar no Google</a></section>
-
-      <section id="local" className="location">
-        <div><span className="kicker">ENDEREÇO E HORÁRIOS</span><h2>Vitinho Barber</h2><p><MapPin /> {address}</p><p><Clock3 /> Segunda: 14h–20h<br />Terça a sábado: 9h–20h<br />Domingo: fechado</p><div className="actions"><a className="btn gold" href={mapsUrl} target="_blank" rel="noreferrer">Abrir no mapa</a><a className="btn ghost" href={whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a></div></div>
-        <iframe title="Mapa da Vitinho Barber" loading="lazy" src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`} />
+        <iframe
+          title="Mapa da Vitinho Barber"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+        />
       </section>
 
       <footer>
-        <a className="brand" href="#inicio"><span className="brandmark"><Scissors /></span><b>VITINHO</b><small>BARBER</small></a>
+        <Brand />
         <p>Barbearia no bairro Santos Dumont,<br />em São Leopoldo.</p>
-        <div><a href={whatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a><a href={instagramUrl} target="_blank" rel="noreferrer">Instagram</a><a href="/privacidade">Privacidade</a><a href="/admin">Painel</a></div>
-        <div className="developerCredit"><span>PROJETO E DESENVOLVIMENTO</span><b>KAIRUS COMERCIAL</b></div>
+        <div>
+          <a href={generalWhatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a>
+          <a href={instagramUrl} target="_blank" rel="noreferrer">Instagram</a>
+          <Link href="/privacidade">Privacidade</Link>
+          <Link href="/admin">Painel</Link>
+        </div>
+        <div className="developerCredit">
+          <span>PROJETO E DESENVOLVIMENTO</span>
+          <b>KAIRUS COMERCIAL</b>
+        </div>
         <small>© {new Date().getFullYear()} Vitinho Barber · Todos os direitos reservados.</small>
       </footer>
-      <a className="floatingWa" href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="Abrir WhatsApp"><MessageCircle /></a>
-      <a className="mobileBook" href="#agendar"><CalendarDays /> Ver horários</a>
+
+      <a
+        className="floatingWa"
+        href={generalWhatsappUrl}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Abrir WhatsApp"
+      >
+        <MessageCircle />
+      </a>
+      <a className="mobileBook" href="#agendar"><CalendarDays /> Escolher meu horário</a>
     </main>
   );
 }

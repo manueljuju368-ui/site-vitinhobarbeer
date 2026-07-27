@@ -20,9 +20,16 @@ export default function Experience() {
       }
     }), {threshold: 0.08, rootMargin: '0px 0px -24px'});
     targets.forEach((element) => observer.observe(element));
+    const revealFallback = window.setTimeout(() => {
+      targets.forEach((element) => element.classList.add('visible'));
+    }, 1400);
     onScroll();
     addEventListener('scroll', onScroll, {passive: true});
-    return () => { removeEventListener('scroll', onScroll); observer.disconnect(); };
+    return () => {
+      window.clearTimeout(revealFallback);
+      removeEventListener('scroll', onScroll);
+      observer.disconnect();
+    };
   }, []);
   return <div className="scrollProgress" />;
 }
