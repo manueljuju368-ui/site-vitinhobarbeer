@@ -11,11 +11,12 @@ export function BrandMark({className = ''}: {className?: string}) {
   return (
     <Image
       className={className}
-      src="/logo-oficial-vitinho.webp"
+      src="/logo-vitinho-compact-v1.webp"
       alt=""
       width={64}
       height={64}
       sizes="64px"
+      loading="eager"
     />
   );
 }

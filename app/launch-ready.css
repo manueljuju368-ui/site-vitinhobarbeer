@@ -741,6 +741,11 @@ body {
     transform: none;
   }
 
+  .portfolioGallery figure {
+    height: auto;
+    aspect-ratio: 5 / 6;
+  }
+
   .team .teamGrid {
     grid-template-columns: 1fr;
   }
@@ -897,7 +902,8 @@ body {
   }
 
   .portfolioGallery figure {
-    height: 480px;
+    height: auto;
+    aspect-ratio: 5 / 6;
     scroll-snap-align: center;
   }
 
@@ -944,6 +950,40 @@ body {
 
   .agendaDatePicker input {
     width: 100%;
+    min-height: 44px;
+  }
+
+  .agendaDatePicker > button {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+
+  .agendaTop button {
+    min-height: 44px;
+  }
+
+  .agendaToolbar > div {
+    display: flex;
+    gap: 8px;
+    padding-bottom: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .agendaToolbar > div::-webkit-scrollbar {
+    display: none;
+  }
+
+  .agendaToolbar button {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding-inline: 16px;
+  }
+
+  .appointment .agendaActions button {
+    width: 44px;
+    height: 44px;
   }
 
   .agendaMetrics {

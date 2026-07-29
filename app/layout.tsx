@@ -54,9 +54,9 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
   },
   icons: {
-    icon: [{url: '/logo-oficial-vitinho.webp', type: 'image/webp'}],
-    shortcut: '/logo-oficial-vitinho.webp',
-    apple: '/logo-oficial-vitinho.png',
+    icon: [{url: '/logo-vitinho-compact-v1.webp', type: 'image/webp'}],
+    shortcut: '/logo-vitinho-compact-v1.webp',
+    apple: '/apple-touch-icon-v1.png',
   },
   openGraph: {
     title: 'Vitinho Barber',

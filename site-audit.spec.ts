@@ -1,4 +1,28 @@
-import {expect, test} from '@playwright/test';
+import {expect, test, type Page} from '@playwright/test';
+
+async function expectLocalImagesLoaded(page: Page) {
+  const images = page.locator('img');
+
+  for (let index = 0; index < await images.count(); index += 1) {
+    const image = images.nth(index);
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(
+      () => image.evaluate((element) => {
+        const currentImage = element as HTMLImageElement;
+        return currentImage.complete ? currentImage.naturalWidth : 0;
+      }),
+      {message: `A imagem ${index + 1} não carregou no celular.`},
+    ).toBeGreaterThan(0);
+  }
+
+  const sources = await images.evaluateAll((elements) => (
+    elements.map((element) => {
+      const image = element as HTMLImageElement;
+      return image.currentSrc || image.getAttribute('src') || '';
+    })
+  ));
+  expect(sources.every((source) => source && !source.includes('/_next/image'))).toBeTruthy();
+}
 
 test('desktop: conteúdo, marca e responsividade base', async ({page}, testInfo) => {
   await page.setViewportSize({width: 1440, height: 1000});
@@ -32,8 +56,25 @@ test('mobile: sem vazamento e com chamada fixa', async ({page}, testInfo) => {
   }
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
+  await expectLocalImagesLoaded(page);
   await page.waitForTimeout(800);
   await page.screenshot({path: testInfo.outputPath('mobile-full.png'), fullPage: true});
+});
+
+test('mobile compacto: imagens e conteúdo cabem em 320px', async ({page}) => {
+  await page.setViewportSize({width: 320, height: 568});
+  await page.goto('/');
+
+  await expectLocalImagesLoaded(page);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
+
+  const cards = await page.locator('.portfolioGallery figure').evaluateAll((elements) => (
+    elements.map((element) => {
+      const rect = element.getBoundingClientRect();
+      return {width: rect.width, height: rect.height};
+    })
+  ));
+  expect(cards.every(({width, height}) => width <= 320 && height <= 360)).toBeTruthy();
 });
 
 test('agendamento: percorre as quatro etapas e valida os dados', async ({page}) => {
@@ -93,6 +134,41 @@ test('painel e API administrativa permanecem protegidos', async ({page, request}
   await expect(page).toHaveURL(/\/login(?:\?|$)/);
   await expect(page.getByRole('heading', {name: 'Agenda Vitinho'})).toBeVisible();
   await expect(page.locator('.loginLogo img')).toBeVisible();
+});
+
+test('painel autenticado funciona no celular', async ({page}) => {
+  test.skip(!process.env.ADMIN_PASSWORD, 'ADMIN_PASSWORD não configurada para o teste autenticado.');
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/login');
+  await page.getByLabel('Senha de acesso').fill(process.env.ADMIN_PASSWORD || '');
+
+  const appointmentsResponse = page.waitForResponse((response) => (
+    response.url().includes('/api/admin/appointments')
+    && response.request().method() === 'GET'
+  ));
+  await page.getByRole('button', {name: /acessar agenda/i}).click();
+  await expect(page).toHaveURL(/\/admin$/);
+  expect((await appointmentsResponse).status()).toBe(200);
+
+  await expect(page.getByRole('heading', {name: 'Agenda da barbearia'})).toBeVisible();
+  await expect(page.locator('.agendaMetrics article')).toHaveCount(4);
+  await expectLocalImagesLoaded(page);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
+
+  const currentDate = await page.locator('.agendaDatePicker input').inputValue();
+  const nextResponse = page.waitForResponse((response) => (
+    response.url().includes('/api/admin/appointments')
+    && response.url().includes('date=')
+    && response.request().method() === 'GET'
+  ));
+  await page.locator('.agendaDatePicker > button').nth(1).click();
+  await expect(page.locator('.agendaDatePicker input')).not.toHaveValue(currentDate);
+  expect((await nextResponse).status()).toBe(200);
+
+  const filterHeights = await page.locator('.agendaToolbar button').evaluateAll((buttons) => (
+    buttons.map((button) => button.getBoundingClientRect().height)
+  ));
+  expect(filterHeights.every((height) => height >= 44)).toBeTruthy();
 });
 
 test('serviços técnicos são encaminhados para consulta', async ({page}) => {

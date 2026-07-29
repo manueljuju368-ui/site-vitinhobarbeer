@@ -23,7 +23,10 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    formats: ['image/avif', 'image/webp'],
+    // All visual assets are already compressed WebP files. Serving them directly
+    // avoids a dynamic /_next/image request that can fail in older mobile
+    // browsers and in embedded WebViews.
+    unoptimized: true,
   },
   async headers() {
     return [{
