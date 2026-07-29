@@ -84,7 +84,10 @@ test('agendamento: exibe recuperação quando a agenda falha', async ({page}) =>
   await expect(page.getByRole('button', {name: /tentar novamente/i})).toBeVisible();
 });
 
-test('painel protegido e tela de login disponíveis', async ({page}) => {
+test('painel e API administrativa permanecem protegidos', async ({page, request}) => {
+  const apiResponse = await request.get('/api/admin/appointments');
+  expect(apiResponse.status()).toBe(401);
+
   const response = await page.goto('/admin');
   expect(response?.status()).toBe(200);
   await expect(page).toHaveURL(/\/login(?:\?|$)/);

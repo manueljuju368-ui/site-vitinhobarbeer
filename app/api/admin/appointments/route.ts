@@ -1,5 +1,6 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {z} from 'zod';
+import {ADMIN_COOKIE, verifyAdminSession} from '@/lib/admin-session';
 import {createAdminClient} from '@/utils/supabase/server';
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -21,7 +22,16 @@ const today = () => new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
 }).format(new Date());
 
+const authorized = (request: NextRequest) => verifyAdminSession(
+  request.cookies.get(ADMIN_COOKIE)?.value,
+  process.env.ADMIN_SESSION_SECRET,
+);
+
 export async function GET(request: NextRequest) {
+  if (!await authorized(request)) {
+    return NextResponse.json({error: 'Não autorizado.'}, {status: 401});
+  }
+
   const db = createAdminClient();
   if (!db) return NextResponse.json({error: 'Banco indisponível.'}, {status: 503});
 
@@ -41,6 +51,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  if (!await authorized(request)) {
+    return NextResponse.json({error: 'Não autorizado.'}, {status: 401});
+  }
+
   const db = createAdminClient();
   if (!db) return NextResponse.json({error: 'Banco indisponível.'}, {status: 503});
 
