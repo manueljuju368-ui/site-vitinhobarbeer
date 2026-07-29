@@ -1,0 +1,56 @@
+name: Build Sites Linux bundle
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sites-linux-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build OpenNext for Cloudflare
+        run: npm run build:sites
+
+      - name: Package Sites bundle
+        run: tar -czf sites-build.tar.gz .open-next .openai/hosting.json wrangler.jsonc
+
+      - name: Publish build artifact branch
+        env:
+          BUILD_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          artifact_dir="$RUNNER_TEMP/sites-linux-artifact"
+          mkdir -p "$artifact_dir"
+          cp sites-build.tar.gz "$artifact_dir/sites-build.tar.gz"
+          printf '%s\n' "$GITHUB_SHA" > "$artifact_dir/source-commit.txt"
+          cd "$artifact_dir"
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b sites-linux-artifact
+          git add sites-build.tar.gz source-commit.txt
+          git commit -m "build: Sites Linux bundle for $GITHUB_SHA"
+          git remote add origin "https://x-access-token:${BUILD_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin sites-linux-artifact
