@@ -59,7 +59,7 @@ não confirma reservas temporárias em memória.
 
 Confirme diretamente com a barbearia:
 
-- endereço exibido: `Rua Emílio Muller, 27, Santos Dumont, São Leopoldo – RS`;
+- endereço exibido: `Av. Leopoldo Wasun, 140, Santos Dumont, São Leopoldo – RS, 93115-380`;
 - WhatsApp: `+55 51 98971-9243`;
 - horários de Vitinho OFC e Pablo;
 - preços e disponibilidade dos serviços;

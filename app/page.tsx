@@ -18,6 +18,7 @@ import Brand, {BrandMark} from '@/components/Brand';
 import Booking from '@/components/Booking';
 import {address, barbers, services, whatsapp} from '@/lib/data';
 import {
+  googleMapsEmbedUrl,
   googleMapsUrl,
   googleReviewUrl,
   instagramUrl,
@@ -32,8 +33,6 @@ const consultationUrl = whatsappLink(
   whatsapp,
   'Olá! Vim pelo site e gostaria de consultar um horário para pigmentação, luzes ou platinado.',
 );
-const mapsUrl = googleMapsUrl(address);
-
 const portfolio = [
   {
     src: '/corte-luzes-v2.webp',
@@ -244,7 +243,7 @@ export default function Home() {
           <p><MapPin /> {address}</p>
           <p><Clock3 /> Segunda: 14h–20h<br />Terça a sábado: 9h–20h<br />Domingo: fechado</p>
           <div className="actions">
-            <a className="btn gold" href={mapsUrl} target="_blank" rel="noreferrer">Abrir no mapa</a>
+            <a className="btn gold" href={googleMapsUrl} target="_blank" rel="noreferrer">Abrir no mapa</a>
             <a className="btn ghost" href={generalWhatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a>
           </div>
         </div>
@@ -252,7 +251,7 @@ export default function Home() {
           title="Mapa da Vitinho Barber"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+          src={googleMapsEmbedUrl}
         />
       </section>
 

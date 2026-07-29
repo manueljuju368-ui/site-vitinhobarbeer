@@ -178,6 +178,25 @@ test('serviços técnicos são encaminhados para consulta', async ({page}) => {
   await expect(page.getByRole('link', {name: 'Consultar', exact: true})).toHaveAttribute('href', /wa\.me/);
 });
 
+test('localização usa o cadastro oficial da barbearia no Google', async ({page}) => {
+  await page.goto('/#local');
+  const location = page.locator('#local');
+
+  await expect(location).toContainText('Av. Leopoldo Wasun, 140');
+  await expect(location.getByRole('link', {name: 'Abrir no mapa'})).toHaveAttribute(
+    'href',
+    'https://www.google.com/maps?cid=10751965307132235080',
+  );
+  await expect(location.locator('iframe')).toHaveAttribute(
+    'src',
+    /cid=10751965307132235080/,
+  );
+  await expect(page.getByRole('link', {name: 'Avaliar no Google'})).toHaveAttribute(
+    'href',
+    'https://www.google.com/maps?cid=10751965307132235080',
+  );
+});
+
 test('saúde da aplicação confirma o banco', async ({request}) => {
   const response = await request.get('/api/health');
   expect(response.status()).toBe(200);

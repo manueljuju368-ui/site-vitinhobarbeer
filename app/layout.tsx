@@ -18,7 +18,7 @@ import './final-pass.css';
 import './launch-ready.css';
 import Experience from '@/components/Experience';
 import {address, whatsapp} from '@/lib/data';
-import {siteUrl} from '@/lib/site';
+import {googleMapsUrl, siteUrl} from '@/lib/site';
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -88,9 +88,10 @@ const businessSchema = {
     streetAddress: address.split(', Santos Dumont')[0],
     addressLocality: 'São Leopoldo',
     addressRegion: 'RS',
+    postalCode: '93115-380',
     addressCountry: 'BR',
   },
-  sameAs: ['https://instagram.com/vitinhobarber_ofc'],
+  sameAs: ['https://instagram.com/vitinhobarber_ofc', googleMapsUrl],
 };
 
 export default function Layout({children}: {children: React.ReactNode}) {

@@ -29,4 +29,4 @@ export const barbers = [
   },
 ];
 export const whatsapp='5551989719243';
-export const address='Rua Emílio Muller, 27, Santos Dumont, São Leopoldo – RS';
+export const address='Av. Leopoldo Wasun, 140, Santos Dumont, São Leopoldo – RS, 93115-380';
