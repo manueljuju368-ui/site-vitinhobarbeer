@@ -33,6 +33,8 @@ const oswald = Oswald({
   display: 'swap',
 });
 
+const socialImageUrl = `${siteUrl}/social-preview-vitinho-v1.jpg`;
+
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -66,13 +68,20 @@ export const metadata: Metadata = {
     siteName: 'Vitinho Barber',
     locale: 'pt_BR',
     type: 'website',
-    images: [{url: '/hero-campaign-v2.webp', width: 1920, height: 1080, alt: 'Cortes realizados pela Vitinho Barber'}],
+    images: [{
+      url: socialImageUrl,
+      secureUrl: socialImageUrl,
+      width: 1200,
+      height: 630,
+      type: 'image/jpeg',
+      alt: 'Logo oficial da Vitinho Barber',
+    }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Vitinho Barber | Barbearia em São Leopoldo',
     description: 'Escolha o serviço, consulte os horários e agende online.',
-    images: ['/hero-campaign-v2.webp'],
+    images: [socialImageUrl],
   },
 };
 

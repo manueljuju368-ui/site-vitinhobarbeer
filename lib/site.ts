@@ -1,5 +1,5 @@
 export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://vitinhobarber.com.br'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://vitinhobarbeer-oficial.vercel.app'
 ).replace(/\/+$/, '');
 
 export const instagramUrl = 'https://www.instagram.com/vitinhobarber_ofc';

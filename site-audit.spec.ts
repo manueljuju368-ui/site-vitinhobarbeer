@@ -210,6 +210,21 @@ test('localização usa o cadastro oficial da barbearia no Google', async ({page
   );
 });
 
+test('compartilhamento social usa a capa com a logo oficial', async ({page, request}) => {
+  await page.goto('/');
+  const expectedImage = 'https://vitinhobarbeer-oficial.vercel.app/social-preview-vitinho-v1.jpg';
+
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', expectedImage);
+  await expect(page.locator('meta[property="og:image:type"]')).toHaveAttribute('content', 'image/jpeg');
+  await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute('content', '1200');
+  await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute('content', '630');
+  await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', expectedImage);
+
+  const imageResponse = await request.get('/social-preview-vitinho-v1.jpg');
+  expect(imageResponse.status()).toBe(200);
+  expect(imageResponse.headers()['content-type']).toContain('image/jpeg');
+});
+
 test('saúde da aplicação confirma o banco', async ({request}) => {
   const response = await request.get('/api/health');
   expect(response.status()).toBe(200);
