@@ -2,6 +2,7 @@ node_modules/
 .next/
 .open-next/
 .wrangler/
+.wrangler-bundle*/
 .env
 .env.local
 .env.*.local

@@ -34,6 +34,15 @@ jobs:
       - name: Build OpenNext for Cloudflare
         run: npm run build:sites
 
+      - name: Prebundle Worker for the Sites runtime
+        run: |
+          npx wrangler deploy --dry-run --outdir .wrangler-bundle
+          cp .wrangler-bundle/worker.js .open-next/worker.js
+          if grep -Fq 'require("node:crypto")' .open-next/worker.js; then
+            echo "The Worker still contains an unbundled Node.js require call."
+            exit 1
+          fi
+
       - name: Package Sites bundle
         run: tar -czf sites-build.tar.gz .open-next .openai/hosting.json wrangler.jsonc
 
