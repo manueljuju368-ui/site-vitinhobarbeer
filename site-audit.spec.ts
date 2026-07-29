@@ -77,6 +77,19 @@ test('mobile compacto: imagens e conteúdo cabem em 320px', async ({page}) => {
   expect(cards.every(({width, height}) => width <= 320 && height <= 360)).toBeTruthy();
 });
 
+test('trabalhos reais têm carrossel organizado e navegável', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/#portfolio');
+
+  const carousel = page.getByRole('region', {name: 'Carrossel de trabalhos reais'});
+  await expect(carousel.locator('figure')).toHaveCount(9);
+  await expect(page.getByText('Arraste para ver os trabalhos')).toBeVisible();
+  await expect(page.getByLabel('Foto anterior')).toBeDisabled();
+  await page.getByLabel('Próxima foto').click();
+  await expect(page.locator('.portfolioControls strong')).toContainText('02');
+  await expectLocalImagesLoaded(page);
+});
+
 test('agendamento: percorre as quatro etapas e valida os dados', async ({page}) => {
   await page.setViewportSize({width: 390, height: 844});
   await page.goto('/#agendar');

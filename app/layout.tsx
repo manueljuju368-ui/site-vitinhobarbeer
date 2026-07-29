@@ -16,6 +16,7 @@ import './human-finish.css';
 import './mobile-redesign.css';
 import './final-pass.css';
 import './launch-ready.css';
+import './portfolio-carousel.css';
 import Experience from '@/components/Experience';
 import {address, whatsapp} from '@/lib/data';
 import {googleMapsUrl, siteUrl} from '@/lib/site';

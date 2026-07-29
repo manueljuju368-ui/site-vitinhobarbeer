@@ -1,0 +1,196 @@
+.portfolioCarousel {
+  min-width: 0;
+  align-self: center;
+}
+
+.portfolioCarouselTop {
+  display: flex;
+  min-height: 48px;
+  margin-bottom: 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.portfolioCarouselTop > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: rgba(255, 255, 255, .58);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+
+.portfolioCarouselTop > span svg {
+  width: 18px;
+  color: var(--gold);
+}
+
+.portfolioControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.portfolioControls button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .035);
+  color: #fff;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s, opacity .2s;
+}
+
+.portfolioControls button:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: #111;
+}
+
+.portfolioControls button:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+.portfolioControls svg {
+  width: 18px;
+}
+
+.portfolioControls strong {
+  min-width: 64px;
+  color: var(--gold);
+  font: 600 17px var(--font-oswald), sans-serif;
+  text-align: center;
+}
+
+.portfolioControls small {
+  color: rgba(255, 255, 255, .42);
+  font-size: 10px;
+}
+
+.portfolioCarousel .portfolioGallery {
+  display: flex;
+  grid-template-columns: none;
+  grid-auto-flow: initial;
+  gap: 14px;
+  margin: 0;
+  padding: 28px max(20px, calc(50% - 185px));
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: max(20px, calc(50% - 185px));
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  touch-action: pan-x pinch-zoom;
+}
+
+.portfolioCarousel .portfolioGallery::-webkit-scrollbar {
+  display: none;
+}
+
+.portfolioCarousel .portfolioGallery figure,
+.portfolioCarousel .portfolioGallery figure:nth-child(n) {
+  flex: 0 0 clamp(270px, 26vw, 370px);
+  width: clamp(270px, 26vw, 370px);
+  min-width: clamp(270px, 26vw, 370px);
+  height: auto;
+  aspect-ratio: 4 / 5;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  transform: none;
+}
+
+.portfolioCarousel .portfolioGallery img {
+  object-position: center;
+}
+
+.portfolioProgress {
+  height: 2px;
+  margin-top: 16px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .11);
+}
+
+.portfolioProgress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gold);
+  transition: width .25s ease;
+}
+
+@media (max-width: 1050px) {
+  .portfolioCarousel {
+    margin-top: 42px;
+  }
+
+  .portfolioCarousel .portfolioGallery {
+    margin-inline: calc(-1 * clamp(22px, 5vw, 70px));
+  }
+}
+
+@media (max-width: 600px) {
+  .portfolioCarousel {
+    margin-top: 32px;
+  }
+
+  .portfolioCarouselTop {
+    margin-bottom: 8px;
+  }
+
+  .portfolioCarouselTop > span {
+    max-width: 128px;
+    font-size: 8px;
+    line-height: 1.4;
+  }
+
+  .portfolioControls {
+    gap: 6px;
+  }
+
+  .portfolioControls strong {
+    min-width: 52px;
+    font-size: 15px;
+  }
+
+  .portfolioCarousel .portfolioGallery {
+    gap: 10px;
+    margin-inline: -18px;
+    padding: 12px 9vw;
+    scroll-padding-inline: 9vw;
+  }
+
+  .portfolioCarousel .portfolioGallery figure,
+  .portfolioCarousel .portfolioGallery figure:nth-child(n) {
+    flex-basis: 82vw;
+    width: 82vw;
+    min-width: 82vw;
+    max-height: 360px;
+    aspect-ratio: 4 / 5;
+  }
+
+  .portfolioProgress {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 370px) {
+  .portfolioCarousel .portfolioGallery {
+    padding-inline: 7vw;
+    scroll-padding-inline: 7vw;
+  }
+
+  .portfolioCarousel .portfolioGallery figure,
+  .portfolioCarousel .portfolioGallery figure:nth-child(n) {
+    flex-basis: 86vw;
+    width: 86vw;
+    min-width: 86vw;
+  }
+}

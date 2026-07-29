@@ -16,6 +16,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Brand, {BrandMark} from '@/components/Brand';
 import Booking from '@/components/Booking';
+import PortfolioCarousel from '@/components/PortfolioCarousel';
 import {address, barbers, services, whatsapp} from '@/lib/data';
 import {
   googleMapsEmbedUrl,
@@ -33,24 +34,6 @@ const consultationUrl = whatsappLink(
   whatsapp,
   'Olá! Vim pelo site e gostaria de consultar um horário para pigmentação, luzes ou platinado.',
 );
-const portfolio = [
-  {
-    src: '/corte-luzes-v2.webp',
-    title: 'Luzes e textura',
-    alt: 'Corte masculino com luzes realizado na Vitinho Barber',
-  },
-  {
-    src: '/corte-degrade-v2.webp',
-    title: 'Degradê e freestyle',
-    alt: 'Corte degradê com risco realizado na Vitinho Barber',
-  },
-  {
-    src: '/corte-platinado-v2.webp',
-    title: 'Platinado',
-    alt: 'Corte platinado realizado na Vitinho Barber',
-  },
-];
-
 export default function Home() {
   return (
     <main>
@@ -193,14 +176,7 @@ export default function Home() {
             <Instagram /> @vitinhobarber_ofc
           </a>
         </div>
-        <div className="portfolioGallery">
-          {portfolio.map((image, index) => (
-            <figure className={index === 1 ? 'featuredShot' : ''} key={image.src}>
-              <Image src={image.src} alt={image.alt} fill sizes="(max-width: 900px) 88vw, 24vw" />
-              <figcaption><span>0{index + 1}</span>{image.title}</figcaption>
-            </figure>
-          ))}
-        </div>
+        <PortfolioCarousel />
       </section>
 
       <section id="equipe" className="section team" aria-labelledby="team-title">
