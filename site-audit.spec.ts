@@ -25,6 +25,22 @@ async function expectLocalImagesLoaded(page: Page) {
   expect(sources.every((source) => source && !source.includes('/_next/image'))).toBeTruthy();
 }
 
+async function reachBookingConfirmation(page: Page) {
+  await page.route('**/api/availability**', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({slots: [{time: '14:00', available: true}], duration: 60}),
+  }));
+  await page.goto('/#agendar');
+  await page.locator('.choices button').first().click();
+  await page.getByRole('button', {name: /continuar/i}).click();
+  await page.getByRole('button', {name: /continuar/i}).click();
+  await page.getByRole('button', {name: /14:00 disponível/i}).click();
+  await page.getByRole('button', {name: /continuar/i}).click();
+  await page.getByLabel('Nome completo').fill('Cliente Teste');
+  await page.getByRole('textbox', {name: 'WhatsApp', exact: true}).fill('51999999999');
+}
+
 test('desktop: conteúdo, marca e responsividade base', async ({page}, testInfo) => {
   await page.setViewportSize({width: 1440, height: 1000});
   await page.goto('/');
@@ -203,6 +219,50 @@ test('agendamento mantém o fluxo funcional no desktop', async ({page}) => {
   expect(box).not.toBeNull();
   expect((box?.width || 0) >= 500).toBeTruthy();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
+});
+
+test('confirmação conclui o pedido e prepara o WhatsApp', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await reachBookingConfirmation(page);
+
+  let submitted: Record<string, unknown> | null = null;
+  await page.route('**/api/appointments', async (route) => {
+    submitted = route.request().postDataJSON();
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ok: true}),
+    });
+  });
+  await page.getByRole('button', {name: /confirmar agendamento/i}).click();
+
+  await expect(page.getByRole('heading', {name: 'Pedido recebido!'})).toBeVisible();
+  expect(submitted).toMatchObject({
+    name: 'Cliente Teste',
+    phone: '51999999999',
+    serviceId: 'navalhado',
+    barberName: 'Vitinho OFC',
+    time: '14:00',
+  });
+  await expect(page.getByRole('link', {name: /confirmar pelo WhatsApp/i})).toHaveAttribute(
+    'href',
+    /wa\.me\/5551989719243/,
+  );
+});
+
+test('conflito de reserva devolve o cliente para escolher outro horário', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await reachBookingConfirmation(page);
+  await page.route('**/api/appointments', (route) => route.fulfill({
+    status: 409,
+    contentType: 'application/json',
+    body: JSON.stringify({error: 'Este horário acabou de ser reservado. Escolha outro.'}),
+  }));
+  await page.getByRole('button', {name: /confirmar agendamento/i}).click();
+
+  await expect(page.getByRole('heading', {name: /escolha dia e horário/i})).toBeVisible();
+  await expect(page.locator('.bookingError')).toContainText('Este horário acabou de ser reservado');
+  await expect(page.getByRole('button', {name: /continuar/i})).toBeDisabled();
 });
 
 test('painel e API administrativa permanecem protegidos', async ({page, request}) => {
