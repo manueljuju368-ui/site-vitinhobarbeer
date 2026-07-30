@@ -1,4 +1,5 @@
 import {NextRequest, NextResponse} from 'next/server';
+import {isCalendarDate} from '@/lib/booking-date';
 import {barbers, services} from '@/lib/data';
 import {demoAppointments} from '@/lib/demo-appointments';
 import {createAdminClient} from '@/utils/supabase/server';
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
   if (!date || !barberName || !serviceId) {
     return NextResponse.json({error: 'Parâmetros incompletos.'}, {status: 400});
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < todayInBrazil() || date > lastBookingDate()) {
+  if (!isCalendarDate(date) || date < todayInBrazil() || date > lastBookingDate()) {
     return NextResponse.json({error: 'Data fora do período de agendamento.'}, {status: 400});
   }
 
@@ -108,7 +109,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const {data: activeBarbers} = await db.from('barbers').select('id,name').eq('active', true);
+    const {data: activeBarbers, error: barbersError} = await db
+      .from('barbers')
+      .select('id,name')
+      .eq('active', true);
+    if (barbersError) {
+      return NextResponse.json({error: 'A agenda está temporariamente indisponível.'}, {status: 503});
+    }
     const barber = activeBarbers?.find((entry) => entry.name === barberName);
     if (!barber) {
       return NextResponse.json({error: 'Profissional não encontrado.'}, {status: 404});

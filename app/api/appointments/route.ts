@@ -1,5 +1,6 @@
 import {NextResponse} from 'next/server';
 import {z} from 'zod';
+import {isCalendarDate} from '@/lib/booking-date';
 import {barbers, services} from '@/lib/data';
 import {demoAppointments} from '@/lib/demo-appointments';
 import {rateLimited, requestIp} from '@/lib/rate-limit';
@@ -7,7 +8,7 @@ import {createAdminClient} from '@/utils/supabase/server';
 
 const input = z.object({
   name: z.string().trim().min(3).max(100),
-  phone: z.string().regex(/^\d{10,13}$/),
+  phone: z.string().regex(/^(?:\d{10,11}|55\d{10,11})$/),
   serviceId: z.string().min(1).max(50),
   barberName: z.string().min(1).max(80),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
       return NextResponse.json({error: 'Serviço ou profissional indisponível.'}, {status: 400});
     }
 
-    if (body.date < todayInBrazil() || body.date > maxBookingDate()) {
+    if (!isCalendarDate(body.date) || body.date < todayInBrazil() || body.date > maxBookingDate()) {
       return NextResponse.json({error: 'Escolha uma data dentro do período disponível.'}, {status: 400});
     }
 
@@ -162,6 +163,8 @@ export async function POST(request: Request) {
       ? {start: hours.start_time.slice(0, 5), end: hours.end_time.slice(0, 5)}
       : defaultHours;
     const startMinute = minutes(body.time);
+    const step = duration <= 30 ? 30 : 60;
+    const alignedWithSchedule = (startMinute - minutes(open.start)) % step === 0;
     const withinHours = startMinute >= minutes(open.start)
       && startMinute + duration <= minutes(open.end);
     const unavailableRanges = [
@@ -172,7 +175,11 @@ export async function POST(request: Request) {
       })),
     ];
 
-    if (!withinHours || overlaps(start, end, unavailableRanges)) {
+    if (!withinHours || !alignedWithSchedule) {
+      return NextResponse.json({error: 'Escolha um dos horários exibidos na agenda.'}, {status: 400});
+    }
+
+    if (overlaps(start, end, unavailableRanges)) {
       return NextResponse.json({error: 'Este horário está indisponível.'}, {status: 409});
     }
 

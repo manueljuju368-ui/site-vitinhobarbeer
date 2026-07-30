@@ -878,6 +878,18 @@ body {
     grid-template-columns: 28px 1fr auto;
   }
 
+  .bookingHelp a,
+  .barber a,
+  footer > div > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 45px;
+  }
+
+  .siteHeader .brand {
+    min-height: 52px;
+  }
+
   .conversionSection .bookingCard {
     margin: 36px -4px 0;
     padding: 18px;
@@ -888,7 +900,7 @@ body {
   }
 
   .consultationBox a {
-    min-height: 40px;
+    min-height: 45px;
   }
 
   .service {
@@ -1046,5 +1058,20 @@ body {
 
   .agendaMetrics {
     grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  .hero {
+    min-height: 620px;
+    padding: 88px 22px 74px !important;
+  }
+
+  .hero h1 {
+    font-size: clamp(48px, 8vw, 68px) !important;
+  }
+
+  .heroProof {
+    margin-top: 22px;
   }
 }

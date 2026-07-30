@@ -1,4 +1,5 @@
 import {expect, test, type Page} from '@playwright/test';
+import {isCalendarDate} from './lib/booking-date';
 
 async function expectLocalImagesLoaded(page: Page) {
   const images = page.locator('img');
@@ -63,6 +64,21 @@ test('mobile: sem vazamento e com chamada fixa', async ({page}, testInfo) => {
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
   await expectLocalImagesLoaded(page);
+
+  const touchTargets = page.locator([
+    '.siteHeader .brand',
+    '.bookingHelp a',
+    '.consultationBox a',
+    '.barber a',
+    'footer > div > a',
+  ].join(','));
+  for (let index = 0; index < await touchTargets.count(); index += 1) {
+    const height = await touchTargets.nth(index).evaluate((element) => (
+      element.getBoundingClientRect().height
+    ));
+    expect(height).toBeGreaterThanOrEqual(44);
+  }
+
   await page.waitForTimeout(800);
   await page.screenshot({path: testInfo.outputPath('mobile-full.png'), fullPage: true});
 });
@@ -81,6 +97,19 @@ test('mobile compacto: imagens e conteúdo cabem em 320px', async ({page}) => {
     })
   ));
   expect(cards.every(({width, height}) => width <= 320 && height <= 360)).toBeTruthy();
+});
+
+test('celular na horizontal mantém a chamada principal visível', async ({page}) => {
+  await page.setViewportSize({width: 844, height: 390});
+  await page.goto('/');
+
+  const title = page.locator('h1');
+  await expect(title).toBeVisible();
+  const box = await title.boundingBox();
+  expect(box).not.toBeNull();
+  expect((box?.y || 999) < 390).toBeTruthy();
+  await expect(page.locator('.mobileBook')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
 });
 
 test('conteúdo aparece conforme o visitante rola a página', async ({page}) => {
@@ -157,9 +186,32 @@ test('agendamento: exibe recuperação quando a agenda falha', async ({page}) =>
   await expect(page.getByRole('button', {name: /tentar novamente/i})).toBeVisible();
 });
 
+test('agendamento mantém o fluxo funcional no desktop', async ({page}) => {
+  await page.setViewportSize({width: 1440, height: 1000});
+  await page.goto('/#agendar');
+
+  const card = page.locator('.bookingCard');
+  await expect(card).toBeVisible();
+  await page.locator('.choices button').first().click();
+  await page.getByRole('button', {name: /continuar/i}).click();
+  await expect(page.getByRole('heading', {name: /escolha o profissional/i})).toBeVisible();
+  await page.getByRole('button', {name: /continuar/i}).click();
+  await expect(page.getByRole('heading', {name: /escolha dia e horário/i})).toBeVisible();
+  await expect(page.locator('.slotLoading')).toBeHidden();
+
+  const box = await card.boundingBox();
+  expect(box).not.toBeNull();
+  expect((box?.width || 0) >= 500).toBeTruthy();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
+});
+
 test('painel e API administrativa permanecem protegidos', async ({page, request}) => {
   const apiResponse = await request.get('/api/admin/appointments');
   expect(apiResponse.status()).toBe(401);
+
+  const invalidLogin = await request.post('/api/login', {data: {password: 'senha-incorreta'}});
+  expect(invalidLogin.status()).toBe(401);
+  expect(invalidLogin.headers()['set-cookie']).toBeUndefined();
 
   const response = await page.goto('/admin');
   expect(response?.status()).toBe(200);
@@ -201,6 +253,24 @@ test('painel autenticado funciona no celular', async ({page}) => {
     buttons.map((button) => button.getBoundingClientRect().height)
   ));
   expect(filterHeights.every((height) => height >= 44)).toBeTruthy();
+
+  await page.getByRole('button', {name: /sair/i}).click();
+  await expect(page).toHaveURL(/\/login$/);
+  expect((await page.request.get('/api/admin/appointments')).status()).toBe(401);
+});
+
+test('painel autenticado permanece organizado no desktop', async ({page}) => {
+  test.skip(!process.env.ADMIN_PASSWORD, 'ADMIN_PASSWORD não configurada para o teste autenticado.');
+  await page.setViewportSize({width: 1440, height: 1000});
+  await page.goto('/login');
+  await page.getByLabel('Senha de acesso').fill(process.env.ADMIN_PASSWORD || '');
+  await page.getByRole('button', {name: /acessar agenda/i}).click();
+
+  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page.locator('.agendaAdmin aside')).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Agenda da barbearia'})).toBeVisible();
+  await expect(page.locator('.agendaMetrics article')).toHaveCount(4);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
 });
 
 test('serviços técnicos são encaminhados para consulta', async ({page}) => {
@@ -248,4 +318,39 @@ test('saúde da aplicação confirma o banco', async ({request}) => {
   const response = await request.get('/api/health');
   expect(response.status()).toBe(200);
   await expect(response.json()).resolves.toMatchObject({status: 'ok', database: true});
+});
+
+test('API rejeita datas impossíveis e horários fora da grade', async ({request}) => {
+  expect(isCalendarDate('2026-02-29')).toBeFalsy();
+  expect(isCalendarDate('2028-02-29')).toBeTruthy();
+
+  const invalidAvailability = await request.get(
+    '/api/availability?date=2026-02-29&barber=Vitinho%20OFC&service=social',
+  );
+  expect(invalidAvailability.status()).toBe(400);
+
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const candidate = new Date();
+  candidate.setDate(candidate.getDate() + 2);
+  while (candidate.getDay() === 0) candidate.setDate(candidate.getDate() + 1);
+
+  const invalidSlot = await request.post('/api/appointments', {
+    data: {
+      name: 'Cliente Teste',
+      phone: '51999999999',
+      serviceId: 'social',
+      barberName: 'Vitinho OFC',
+      date: formatter.format(candidate),
+      time: '09:17',
+    },
+  });
+  expect(invalidSlot.status()).toBe(400);
+  await expect(invalidSlot.json()).resolves.toMatchObject({
+    error: 'Escolha um dos horários exibidos na agenda.',
+  });
 });
