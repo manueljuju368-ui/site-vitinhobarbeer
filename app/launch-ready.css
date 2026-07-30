@@ -51,6 +51,14 @@ body {
   overflow: clip;
 }
 
+.heroPicture {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+}
+
 .heroMedia {
   object-position: center center;
   filter: saturate(.94) contrast(1.02);
@@ -187,6 +195,25 @@ body {
   margin-top: 3px;
   color: #8f9296;
   font-size: 9px;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px) scale(.985);
+  filter: blur(3px);
+  transition:
+    opacity .58s cubic-bezier(.2, .72, .25, 1),
+    transform .58s cubic-bezier(.2, .72, .25, 1),
+    filter .58s ease;
+  transition-delay: var(--delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  will-change: auto;
 }
 
 .valueStrip {
@@ -761,11 +788,14 @@ body {
     padding: 94px 18px 40px !important;
   }
 
-  .heroMedia {
+  .heroPicture {
     top: 68px !important;
     bottom: auto !important;
     height: min(48svh, 410px) !important;
-    object-position: 54% center;
+  }
+
+  .heroMedia {
+    object-position: 50% 38%;
   }
 
   .hero h1 {

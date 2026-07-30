@@ -54,15 +54,22 @@ export default function Home() {
       </header>
 
       <section className="hero" id="inicio" aria-labelledby="hero-title">
-        <Image
-          className="heroMedia"
-          src="/hero-campaign-v2.webp"
-          alt=""
-          fill
-          priority
-          fetchPriority="high"
-          sizes="100vw"
-        />
+        <picture className="heroPicture" aria-hidden="true">
+          <source
+            media="(max-width: 600px)"
+            srcSet="/portfolio-real-risco-v1.webp"
+            type="image/webp"
+          />
+          <Image
+            className="heroMedia"
+            src="/hero-campaign-v2.webp"
+            alt=""
+            fill
+            loading="eager"
+            fetchPriority="high"
+            sizes="100vw"
+          />
+        </picture>
         <div className="heroShade" />
         <div className="heroCopy">
           <div className="eyebrow"><span /> SÃO LEOPOLDO • RS</div>

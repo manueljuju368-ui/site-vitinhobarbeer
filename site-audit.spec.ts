@@ -28,6 +28,9 @@ test('desktop: conteúdo, marca e responsividade base', async ({page}, testInfo)
   await page.setViewportSize({width: 1440, height: 1000});
   await page.goto('/');
   await expect(page.locator('.heroMedia')).toBeVisible();
+  await expect.poll(
+    () => page.locator('.heroMedia').evaluate((element) => (element as HTMLImageElement).currentSrc),
+  ).toContain('hero-campaign-v2.webp');
   await expect(page.locator('.siteHeader .brandmark img')).toBeVisible();
   await expect(page.locator('h1')).toContainText('Seu próximo corte');
 
@@ -46,6 +49,9 @@ test('mobile: sem vazamento e com chamada fixa', async ({page}, testInfo) => {
   await page.goto('/');
   await expect(page.locator('.mobileBook')).toBeVisible();
   await expect(page.locator('.floatingWa')).toBeHidden();
+  await expect.poll(
+    () => page.locator('.heroMedia').evaluate((element) => (element as HTMLImageElement).currentSrc),
+  ).toContain('portfolio-real-risco-v1.webp');
 
   for (const id of ['inicio', 'servicos', 'equipe', 'portfolio', 'agendar', 'local']) {
     await page.locator(`#${id}`).scrollIntoViewIfNeeded();
@@ -75,6 +81,19 @@ test('mobile compacto: imagens e conteúdo cabem em 320px', async ({page}) => {
     })
   ));
   expect(cards.every(({width, height}) => width <= 320 && height <= 360)).toBeTruthy();
+});
+
+test('conteúdo aparece conforme o visitante rola a página', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/');
+
+  const target = page.locator('#servicos .service').first();
+  await expect(target).toHaveClass(/reveal/);
+  await page.waitForTimeout(1600);
+  await expect(target).not.toHaveClass(/visible/);
+
+  await target.scrollIntoViewIfNeeded();
+  await expect(target).toHaveClass(/visible/);
 });
 
 test('trabalhos reais têm carrossel organizado e navegável', async ({page}) => {
