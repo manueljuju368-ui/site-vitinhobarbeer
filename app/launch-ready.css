@@ -762,7 +762,10 @@ body {
   }
 
   .heroMedia {
-    object-position: 64% center;
+    top: 68px !important;
+    bottom: auto !important;
+    height: min(48svh, 410px) !important;
+    object-position: 54% center;
   }
 
   .hero h1 {
