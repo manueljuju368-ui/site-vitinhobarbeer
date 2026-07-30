@@ -1075,3 +1075,9 @@ body {
     margin-top: 22px;
   }
 }
+
+@media (max-width: 900px) {
+  .bookingCard input {
+    font-size: 16px;
+  }
+}

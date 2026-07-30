@@ -183,6 +183,12 @@ test('agendamento: percorre as quatro etapas e valida os dados', async ({page}) 
 
   const name = page.getByLabel('Nome completo');
   const phone = page.getByRole('textbox', {name: 'WhatsApp', exact: true});
+  for (const field of [name, phone]) {
+    const fontSize = await field.evaluate((element) => (
+      Number.parseFloat(window.getComputedStyle(element).fontSize)
+    ));
+    expect(fontSize).toBeGreaterThanOrEqual(16);
+  }
   await name.fill('Vi');
   await name.blur();
   await expect(page.getByText('Informe seu nome completo.')).toBeVisible();
