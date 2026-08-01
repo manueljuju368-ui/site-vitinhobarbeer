@@ -2,29 +2,17 @@ import {NextRequest, NextResponse} from 'next/server';
 import {isCalendarDate} from '@/lib/booking-date';
 import {barbers, services} from '@/lib/data';
 import {demoAppointments} from '@/lib/demo-appointments';
+import {
+  brazilDateTime,
+  clockLabel,
+  clockMinutes,
+  fallbackHours,
+  rangesOverlap,
+  type ScheduleRange,
+} from '@/lib/schedule';
 import {createAdminClient} from '@/utils/supabase/server';
 
-type Range = {start_datetime: string; end_datetime: string};
 type Slot = {time: string; available: boolean; reason?: string};
-
-const fallbackHours = (day: number) => day === 0
-  ? null
-  : day === 1
-    ? {start: '14:00', end: '20:00'}
-    : {start: '09:00', end: '20:00'};
-
-const minutes = (value: string) => {
-  const [hour, minute] = value.slice(0, 5).split(':').map(Number);
-  return hour * 60 + minute;
-};
-
-const clock = (value: number) => (
-  `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`
-);
-
-const overlaps = (start: Date, end: Date, ranges: Range[]) => (
-  ranges.some((range) => start < new Date(range.end_datetime) && end > new Date(range.start_datetime))
-);
 
 const todayInBrazil = () => new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/Sao_Paulo',
@@ -87,9 +75,9 @@ export async function GET(request: NextRequest) {
     const step = duration <= 30 ? 30 : 60;
     const slots: Slot[] = [];
 
-    for (let value = minutes(defaults.start); value + duration <= minutes(defaults.end); value += step) {
-      const time = clock(value);
-      const start = new Date(`${date}T${time}:00-03:00`);
+    for (let value = clockMinutes(defaults.start); value + duration <= clockMinutes(defaults.end); value += step) {
+      const time = clockLabel(value);
+      const start = brazilDateTime(date, time);
       const end = new Date(start.getTime() + duration * 60_000);
       const occupied = demoAppointments.some((appointment) => {
         if (appointment.date !== date || appointment.barber !== barberName) return false;
@@ -162,7 +150,7 @@ export async function GET(request: NextRequest) {
       : defaults;
     const duration = service.duration_minutes || selectedService.duration || 60;
     const step = duration <= 30 ? 30 : 60;
-    const ranges: Range[] = [
+    const ranges: ScheduleRange[] = [
       ...(busy || []),
       ...(blocked || []),
       ...(breaks || []).map((entry) => ({
@@ -172,11 +160,11 @@ export async function GET(request: NextRequest) {
     ];
     const slots: Slot[] = [];
 
-    for (let value = minutes(open.start); value + duration <= minutes(open.end); value += step) {
-      const time = clock(value);
-      const start = new Date(`${date}T${time}:00-03:00`);
+    for (let value = clockMinutes(open.start); value + duration <= clockMinutes(open.end); value += step) {
+      const time = clockLabel(value);
+      const start = brazilDateTime(date, time);
       const end = new Date(start.getTime() + duration * 60_000);
-      const occupied = overlaps(start, end, ranges);
+      const occupied = rangesOverlap(start, end, ranges);
       const past = start.getTime() < Date.now() + 60 * 60_000;
       slots.push({
         time,

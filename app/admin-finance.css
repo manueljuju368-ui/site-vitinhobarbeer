@@ -3,6 +3,20 @@
   color: #777;
   text-transform: capitalize;
 }
+.agendaAdmin {
+  width: 100%;
+  max-width: 100vw;
+  margin-inline: 0;
+  overflow-x: hidden;
+  transform: none;
+}
+.agendaAdmin > section,
+.agendaTop,
+.financeGrid,
+.agendaMetrics {
+  min-width: 0;
+  max-width: 100%;
+}
 .revenueCard {
   background: linear-gradient(135deg, #d4a84e, #947024) !important;
   color: #111;
@@ -100,6 +114,228 @@
   color: #777;
   font-size: 12px;
 }
+.agendaTopActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.agendaTopActions button.primary,
+.adminDialog button.primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #111;
+  font-weight: 800;
+}
+.adminNotice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 13px 15px;
+  border: 1px solid #50dc8b55;
+  border-radius: 8px;
+  background: #50dc8b12;
+  color: #72e7a4;
+  font-size: 12px;
+}
+.adminNotice svg {
+  width: 18px;
+}
+.blockedPanel {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 20px;
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid #63383d;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #261416, #121416 42%);
+}
+.blockedPanel > div:first-child {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+.blockedPanel > div:first-child small,
+.adminDialog > small {
+  color: #ff777f;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+.blockedPanel > div:first-child b {
+  font: 600 20px Oswald;
+  text-transform: uppercase;
+}
+.blockedList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.blockedList article {
+  display: grid;
+  grid-template-columns: 28px 1fr 34px;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 11px 10px;
+  border: 1px solid #ffffff12;
+  border-radius: 8px;
+  background: #0d0f10aa;
+}
+.blockedList article > svg {
+  width: 18px;
+  color: #ff777f;
+}
+.blockedList article span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.blockedList article small {
+  overflow: hidden;
+  color: #888;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.blockedList article button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ffffff16;
+  border-radius: 6px;
+  background: #17191b;
+  color: #aaa;
+}
+.blockedList article button svg {
+  width: 14px;
+}
+.appointment {
+  grid-template-columns: 80px 1.4fr 1.4fr 150px 160px;
+}
+.agendaActions button {
+  width: 36px;
+  height: 36px;
+}
+.adminDialogBackdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: #030405d9;
+  backdrop-filter: blur(8px);
+}
+.adminDialog {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 34px;
+  border: 1px solid #34373a;
+  border-radius: 14px;
+  background: #111315;
+  box-shadow: 0 35px 100px #000c;
+}
+.adminDialog > h2 {
+  margin: 7px 0;
+  font-size: 34px;
+}
+.adminDialog > p {
+  margin: 0 0 24px;
+  color: #888;
+  font-size: 12px;
+}
+.dialogClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #303236;
+  border-radius: 50%;
+  background: #17191b;
+  color: #aaa;
+}
+.dialogClose svg {
+  width: 17px;
+}
+.adminFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.adminFormGrid label {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  color: #aaa;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .4px;
+}
+.adminFormGrid label.wide {
+  grid-column: 1/3;
+}
+.adminFormGrid input,
+.adminFormGrid select {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 0 13px;
+  border: 1px solid #303236;
+  border-radius: 7px;
+  outline: 0;
+  background: #090a0b;
+  color: #eee;
+  font: inherit;
+  font-size: 13px;
+}
+.adminFormGrid input:focus,
+.adminFormGrid select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px #d4a84e18;
+}
+.adminFormGrid .checkLabel {
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid #303236;
+  border-radius: 7px;
+  background: #090a0b;
+  font-size: 12px;
+}
+.adminFormGrid .checkLabel input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: var(--gold);
+}
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #26282b;
+}
+.dialogActions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid #303236;
+  border-radius: 7px;
+  background: #17191b;
+  color: #ddd;
+}
 @media (max-width: 1100px) {
   .financeGrid {
     grid-template-columns: 1fr 1fr;
@@ -107,8 +343,24 @@
   .financeGrid > article:first-child {
     grid-column: 1/3;
   }
+  .agendaTop {
+    align-items: flex-start;
+  }
+  .agendaTopActions {
+    max-width: 410px;
+  }
+  .blockedPanel {
+    grid-template-columns: 1fr;
+  }
 }
 @media (max-width: 650px) {
+  .agendaAdmin {
+    width: 100vw;
+  }
+  .agendaTop {
+    display: block;
+    width: 100%;
+  }
   .financeGrid {
     grid-template-columns: 1fr;
   }
@@ -120,5 +372,49 @@
   }
   .agendaMetrics b {
     font-size: 21px;
+  }
+  .agendaTopActions {
+    display: grid;
+    width: 100%;
+    max-width: none;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 18px;
+  }
+  .agendaTopActions button {
+    min-height: 44px;
+    justify-content: center;
+  }
+  .agendaTopActions button:last-child {
+    grid-column: 1/3;
+  }
+  .blockedList {
+    grid-template-columns: 1fr;
+  }
+  .adminDialogBackdrop {
+    align-items: end;
+    padding: 0;
+  }
+  .adminDialog {
+    width: 100%;
+    max-height: 92svh;
+    padding: 28px 18px 22px;
+    border-radius: 16px 16px 0 0;
+  }
+  .adminFormGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .adminFormGrid label.wide {
+    grid-column: 1;
+  }
+  .dialogActions {
+    position: sticky;
+    bottom: -22px;
+    margin-inline: -18px;
+    padding: 14px 18px 22px;
+    background: #111315;
+  }
+  .dialogActions button {
+    flex: 1;
   }
 }

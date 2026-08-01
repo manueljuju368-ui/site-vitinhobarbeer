@@ -4,6 +4,7 @@ import {isCalendarDate} from '@/lib/booking-date';
 import {barbers, services} from '@/lib/data';
 import {demoAppointments} from '@/lib/demo-appointments';
 import {rateLimited, requestIp} from '@/lib/rate-limit';
+import {brazilDateTime, clockMinutes, fallbackHours, rangesOverlap} from '@/lib/schedule';
 import {createAdminClient} from '@/utils/supabase/server';
 
 const input = z.object({
@@ -33,25 +34,10 @@ const maxBookingDate = () => {
   }).format(date);
 };
 
-const fallbackHours = (day: number) => day === 0
-  ? null
-  : day === 1
-    ? {start: '14:00', end: '20:00'}
-    : {start: '09:00', end: '20:00'};
-
-const minutes = (value: string) => {
-  const [hour, minute] = value.slice(0, 5).split(':').map(Number);
-  return hour * 60 + minute;
-};
-
 const normalizePhone = (value: string) => {
   const digits = value.replace(/\D/g, '');
   return digits.startsWith('55') && digits.length >= 12 ? digits : `55${digits}`;
 };
-
-const overlaps = (start: Date, end: Date, ranges: {start_datetime: string; end_datetime: string}[]) => (
-  ranges.some((range) => start < new Date(range.end_datetime) && end > new Date(range.start_datetime))
-);
 
 export async function POST(request: Request) {
   if (rateLimited(`booking:${requestIp(request)}`, 8, 10 * 60_000)) {
@@ -74,7 +60,7 @@ export async function POST(request: Request) {
       return NextResponse.json({error: 'Escolha uma data dentro do período disponível.'}, {status: 400});
     }
 
-    const start = new Date(`${body.date}T${body.time}:00-03:00`);
+    const start = brazilDateTime(body.date, body.time);
     const weekday = new Date(`${body.date}T12:00:00-03:00`).getDay();
     const defaultHours = fallbackHours(weekday);
     const minimumStart = Date.now() + 60 * 60_000;
@@ -93,11 +79,11 @@ export async function POST(request: Request) {
 
       const duration = selectedService.duration || 60;
       const end = new Date(start.getTime() + duration * 60_000);
-      const startMinute = minutes(body.time);
+      const startMinute = clockMinutes(body.time);
       const step = duration <= 30 ? 30 : 60;
-      const withinHours = startMinute >= minutes(defaultHours.start)
-        && startMinute + duration <= minutes(defaultHours.end)
-        && (startMinute - minutes(defaultHours.start)) % step === 0;
+      const withinHours = startMinute >= clockMinutes(defaultHours.start)
+        && startMinute + duration <= clockMinutes(defaultHours.end)
+        && (startMinute - clockMinutes(defaultHours.start)) % step === 0;
 
       if (!withinHours) {
         return NextResponse.json({error: 'Este horário está fora do expediente.'}, {status: 400});
@@ -162,11 +148,11 @@ export async function POST(request: Request) {
     const open = hours
       ? {start: hours.start_time.slice(0, 5), end: hours.end_time.slice(0, 5)}
       : defaultHours;
-    const startMinute = minutes(body.time);
+    const startMinute = clockMinutes(body.time);
     const step = duration <= 30 ? 30 : 60;
-    const alignedWithSchedule = (startMinute - minutes(open.start)) % step === 0;
-    const withinHours = startMinute >= minutes(open.start)
-      && startMinute + duration <= minutes(open.end);
+    const alignedWithSchedule = (startMinute - clockMinutes(open.start)) % step === 0;
+    const withinHours = startMinute >= clockMinutes(open.start)
+      && startMinute + duration <= clockMinutes(open.end);
     const unavailableRanges = [
       ...(blocked || []),
       ...(breaks || []).map((entry) => ({
@@ -179,7 +165,7 @@ export async function POST(request: Request) {
       return NextResponse.json({error: 'Escolha um dos horários exibidos na agenda.'}, {status: 400});
     }
 
-    if (overlaps(start, end, unavailableRanges)) {
+    if (rangesOverlap(start, end, unavailableRanges)) {
       return NextResponse.json({error: 'Este horário está indisponível.'}, {status: 409});
     }
 

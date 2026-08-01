@@ -8,7 +8,8 @@
 .floatingWa{animation:none!important}
 header{height:94px;background:#08090af2;border-bottom-color:#ffffff1c}
 header .brand{grid-template-columns:60px auto;grid-template-rows:30px 16px;column-gap:14px}
-header .brandmark{width:60px;height:60px;border:1px solid #d4a84e99;box-shadow:0 0 0 4px #ffffff08,0 8px 24px #000c;background-image:url('/logo-oficial-vitinho.webp')!important}
+header .brandmark{width:60px;height:60px;border:1px solid #d4a84e99;box-shadow:0 0 0 4px #ffffff08,0 8px 24px #000c;background-image:none!important}
+.barber.featured .avatar{background-image:none!important}
 header .brand b{font-size:26px;letter-spacing:2.5px;line-height:1}
 header .brand small{font-size:9px;letter-spacing:6px;color:#e2b758}
 header nav{margin-left:28px}

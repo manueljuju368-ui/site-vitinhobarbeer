@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {LockKeyhole} from 'lucide-react';
 import Link from 'next/link';
 import {BrandMark} from '@/components/Brand';
+import '../admin-v2.css';
 
 export default function Login() {
   const [password, setPassword] = useState('');

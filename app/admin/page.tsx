@@ -2,6 +2,8 @@ import {cookies} from 'next/headers';
 import {redirect} from 'next/navigation';
 import AdminAgenda from '@/components/AdminAgenda';
 import {ADMIN_COOKIE, verifyAdminSession} from '@/lib/admin-session';
+import '../admin-v2.css';
+import '../admin-finance.css';
 
 export default async function Admin() {
   const cookieStore = await cookies();

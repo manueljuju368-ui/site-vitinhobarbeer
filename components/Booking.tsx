@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react';
 import {address, barbers, bookableServices, services, whatsapp} from '@/lib/data';
+import {trackEvent} from '@/lib/analytics';
 import {whatsappLink} from '@/lib/site';
 
 type Slot = {
@@ -75,6 +76,20 @@ const formatPhone = (value: string) => {
   return `(${area}) ${first}${second ? `-${second}` : ''}`;
 };
 
+const showBookingTop = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+  const card = document.querySelector<HTMLElement>('#agendar .bookingCard');
+  if (!card) return;
+  card.querySelector<HTMLElement>('h3')?.focus({preventScroll: true});
+  const top = window.scrollY + card.getBoundingClientRect().top - 104;
+  const root = document.documentElement;
+  const previousScrollBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = 'auto';
+  window.scrollTo({top: Math.max(0, top), behavior: 'auto'});
+  requestAnimationFrame(() => {
+    root.style.scrollBehavior = previousScrollBehavior;
+  });
+}));
+
 export default function Booking() {
   const days = useMemo(bookingDays, []);
   const [step, setStep] = useState(1);
@@ -133,11 +148,13 @@ export default function Booking() {
   const next = () => {
     setSubmitError('');
     setStep((current) => Math.min(4, current + 1));
+    showBookingTop();
   };
 
   const back = () => {
     setSubmitError('');
     setStep((current) => Math.max(1, current - 1));
+    showBookingTop();
   };
 
   async function confirm() {
@@ -171,11 +188,17 @@ export default function Booking() {
           setStep(3);
           setTime('');
           setAvailabilityRefresh((value) => value + 1);
+          showBookingTop();
         }
         throw new Error(data.error || 'Não foi possível reservar este horário.');
       }
 
       setDone(true);
+      showBookingTop();
+      trackEvent('booking_requested', {
+        service: item.id,
+        barber,
+      });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Falha de conexão. Tente novamente.');
     } finally {
@@ -190,16 +213,16 @@ export default function Booking() {
     return (
       <div className="bookingCard success" role="status">
         <div className="successIcon"><Check /></div>
-        <small>AGUARDANDO CONFIRMAÇÃO</small>
-        <h3>Pedido recebido!</h3>
+        <small>SOLICITAÇÃO REGISTRADA</small>
+        <h3 tabIndex={-1}>Seu horário está reservado!</h3>
         <p>{item?.name} com {barber}<br /><b>{longDate(date)}, às {time}</b></p>
         <p className="successNote">
-          Seu horário entrou na agenda. Envie a mensagem pronta para a equipe confirmar
-          o atendimento com você.
+          A equipe recebeu seu pedido e o horário já aparece na agenda. Agora envie a
+          mensagem pronta para agilizar a confirmação pelo WhatsApp.
         </p>
         <small>{address}</small>
         <a className="btn gold" target="_blank" rel="noreferrer" href={`https://wa.me/${whatsapp}?text=${text}`}>
-          Confirmar pelo WhatsApp
+          Enviar mensagem de confirmação
         </a>
       </div>
     );
@@ -228,14 +251,17 @@ export default function Booking() {
 
       {step === 1 && (
         <div>
-          <h3>Escolha o serviço</h3>
+          <h3 tabIndex={-1}>Escolha o serviço</h3>
           <div className="choices" aria-label="Serviços disponíveis">
             {bookableServices.map((entry) => (
               <button
                 type="button"
                 aria-pressed={service === entry.id}
                 className={service === entry.id ? 'selected' : ''}
-                onClick={() => setService(entry.id)}
+                onClick={() => {
+                  setService(entry.id);
+                  trackEvent('booking_started', {service: entry.id});
+                }}
                 key={entry.id}
               >
                 <span><b>{entry.name}</b><small>{entry.duration ? `${entry.duration} min` : 'Tempo sob consulta'}</small></span>
@@ -257,7 +283,7 @@ export default function Booking() {
 
       {step === 2 && (
         <div>
-          <h3>Escolha o profissional</h3>
+          <h3 tabIndex={-1}>Escolha o profissional</h3>
           <div className="choices barberChoices" aria-label="Profissionais disponíveis">
             {barbers.map((entry) => (
               <button
@@ -277,7 +303,7 @@ export default function Booking() {
 
       {step === 3 && (
         <div>
-          <h3>Escolha dia e horário</h3>
+          <h3 tabIndex={-1}>Escolha dia e horário</h3>
           <div className="dateChoices" aria-label="Dias disponíveis">
             {days.map((day) => {
               const [weekday, numericDate] = shortDate(day).split(',');
@@ -330,7 +356,7 @@ export default function Booking() {
 
       {step === 4 && (
         <div>
-          <h3>Confirme seus dados</h3>
+          <h3 tabIndex={-1}>Confirme seus dados</h3>
           <label>
             Nome completo
             <input
@@ -363,6 +389,10 @@ export default function Booking() {
             <b>{item ? money(item.price) : ''}</b>
             <small>{barber} · {longDate(date)} às {time}</small>
           </div>
+          <p className="bookingPrivacy">
+            Seus dados serão usados somente para organizar e confirmar o atendimento.{' '}
+            <a href="/privacidade" target="_blank">Veja a política de privacidade.</a>
+          </p>
         </div>
       )}
 

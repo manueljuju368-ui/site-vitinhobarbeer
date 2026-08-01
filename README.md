@@ -53,7 +53,19 @@ não confirma reservas temporárias em memória.
 - Pigmentação, luzes e platinado são enviados para consulta pelo WhatsApp porque a
   duração depende de avaliação.
 - O painel permite consultar qualquer data e atualizar o estado do atendimento.
+- O painel permite registrar reservas recebidas pessoalmente ou pelo WhatsApp.
+- Períodos e dias inteiros podem ser bloqueados pelo painel sem alterar o banco manualmente.
 - A restrição do PostgreSQL impede sobreposição para o mesmo profissional.
+
+## Rotina do painel
+
+- Use **Novo agendamento** quando o cliente marcar fora do site. A reserva entra como
+  confirmada e deixa de aparecer na agenda pública.
+- Use **Bloquear horário** para almoço, compromisso, folga ou outra indisponibilidade.
+- Um bloqueio não pode cobrir um cliente já agendado; cancele ou reorganize a reserva
+  antes de bloquear o período.
+- Os estados disponíveis são aguardando confirmação, confirmado, concluído, cancelado
+  e não compareceu.
 
 ## Antes de apontar o domínio
 

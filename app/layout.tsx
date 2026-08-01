@@ -3,14 +3,9 @@ import {Manrope, Oswald} from 'next/font/google';
 import './globals.css';
 import './booking.css';
 import './booking-v2.css';
-import './logo.css';
-import './admin-v2.css';
-import './admin-finance.css';
 import './credits.css';
-import './credits-fix.css';
 import './polish.css';
 import './mobile-polish.css';
-import './optimized-assets.css';
 import './professional-finish.css';
 import './human-finish.css';
 import './mobile-redesign.css';
@@ -93,6 +88,20 @@ const businessSchema = {
   image: `${siteUrl}/hero-campaign-v2.webp`,
   telephone: `+${whatsapp}`,
   priceRange: 'R$ 15–140',
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: 'Monday',
+      opens: '14:00',
+      closes: '20:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      opens: '09:00',
+      closes: '20:00',
+    },
+  ],
   address: {
     '@type': 'PostalAddress',
     streetAddress: address.split(', Santos Dumont')[0],

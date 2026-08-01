@@ -274,10 +274,24 @@ header .brandmark,
 
 .bookingSection {
   gap: clamp(48px, 7vw, 110px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
 }
 
 .bookingCard {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow: visible;
+  overflow-anchor: none;
+  scroll-margin-top: 104px;
+}
+
+.bookingIntro,
+.bookingCard > div,
+.dateChoices,
+.times {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .bookingProgress > div.active {

@@ -245,7 +245,6 @@ export default function Home() {
           <a href={generalWhatsappUrl} target="_blank" rel="noreferrer">WhatsApp</a>
           <a href={instagramUrl} target="_blank" rel="noreferrer">Instagram</a>
           <Link href="/privacidade">Privacidade</Link>
-          <Link href="/admin" prefetch={false}>Painel</Link>
         </div>
         <div className="developerCredit">
           <span>PROJETO E DESENVOLVIMENTO</span>

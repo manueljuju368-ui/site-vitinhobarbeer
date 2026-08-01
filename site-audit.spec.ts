@@ -208,22 +208,63 @@ test('agendamento: exibe recuperação quando a agenda falha', async ({page}) =>
   await expect(page.getByRole('button', {name: /tentar novamente/i})).toBeVisible();
 });
 
-test('agendamento mantém o fluxo funcional no desktop', async ({page}) => {
+test('agendamento mantém o fluxo funcional no desktop', async ({page}, testInfo) => {
   await page.setViewportSize({width: 1440, height: 1000});
   await page.goto('/#agendar');
 
   const card = page.locator('.bookingCard');
+  const expectCardInView = async () => expect.poll(async () => {
+    const bounds = await card.boundingBox();
+    return Boolean(
+      bounds
+      && bounds.x >= 0
+      && bounds.x + bounds.width <= 1441
+      && bounds.width >= 500
+      && bounds.width <= 700
+      && bounds.y >= 88
+      && bounds.y <= 130
+    );
+  }).toBeTruthy();
+
   await expect(card).toBeVisible();
-  await page.locator('.choices button').first().click();
+  const serviceButtons = card.locator('.choices button');
+  for (let index = 0; index < await serviceButtons.count(); index += 1) {
+    await serviceButtons.nth(index).click();
+    await expect(serviceButtons.nth(index)).toHaveAttribute('aria-pressed', 'true');
+  }
   await page.getByRole('button', {name: /continuar/i}).click();
   await expect(page.getByRole('heading', {name: /escolha o profissional/i})).toBeVisible();
+  await expectCardInView();
+
+  const barberButtons = card.locator('.barberChoices button');
+  for (let index = 0; index < await barberButtons.count(); index += 1) {
+    await barberButtons.nth(index).click();
+    await expect(barberButtons.nth(index)).toHaveAttribute('aria-pressed', 'true');
+  }
   await page.getByRole('button', {name: /continuar/i}).click();
   await expect(page.getByRole('heading', {name: /escolha dia e horário/i})).toBeVisible();
   await expect(page.locator('.slotLoading')).toBeHidden();
+  await expectCardInView();
 
-  const box = await card.boundingBox();
-  expect(box).not.toBeNull();
-  expect((box?.width || 0) >= 500).toBeTruthy();
+  const dateButtons = card.locator('.dateChoices button');
+  let available = card.locator('.times button:not([disabled])');
+  for (let index = 1; index < await dateButtons.count() && await available.count() === 0; index += 1) {
+    await Promise.all([
+      page.waitForResponse((response) => response.url().includes('/api/availability')),
+      dateButtons.nth(index).click(),
+    ]);
+    available = card.locator('.times button:not([disabled])');
+  }
+  await expect(available.first()).toBeVisible();
+  await available.first().click();
+  await page.getByRole('button', {name: /continuar/i}).click();
+  await expect(page.getByRole('heading', {name: /confirme seus dados/i})).toBeVisible();
+  await expectCardInView();
+  await page.screenshot({path: testInfo.outputPath('desktop-booking.png'), fullPage: false});
+
+  await page.getByRole('button', {name: /voltar/i}).click();
+  await expect(page.getByRole('heading', {name: /escolha dia e horário/i})).toBeVisible();
+  await expectCardInView();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
 });
 
@@ -242,7 +283,7 @@ test('confirmação conclui o pedido e prepara o WhatsApp', async ({page}) => {
   });
   await page.getByRole('button', {name: /confirmar agendamento/i}).click();
 
-  await expect(page.getByRole('heading', {name: 'Pedido recebido!'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Seu horário está reservado!'})).toBeVisible();
   expect(submitted).toMatchObject({
     name: 'Cliente Teste',
     phone: '51999999999',
@@ -250,7 +291,7 @@ test('confirmação conclui o pedido e prepara o WhatsApp', async ({page}) => {
     barberName: 'Vitinho OFC',
     time: '14:00',
   });
-  await expect(page.getByRole('link', {name: /confirmar pelo WhatsApp/i})).toHaveAttribute(
+  await expect(page.getByRole('link', {name: /enviar mensagem de confirmação/i})).toHaveAttribute(
     'href',
     /wa\.me\/5551989719243/,
   );
@@ -274,6 +315,10 @@ test('conflito de reserva devolve o cliente para escolher outro horário', async
 test('painel e API administrativa permanecem protegidos', async ({page, request}) => {
   const apiResponse = await request.get('/api/admin/appointments');
   expect(apiResponse.status()).toBe(401);
+  const blocksResponse = await request.get('/api/admin/blocks?date=2026-08-01');
+  expect(blocksResponse.status()).toBe(401);
+  expect((await request.post('/api/admin/appointments', {data: {}})).status()).toBe(401);
+  expect((await request.post('/api/admin/blocks', {data: {}})).status()).toBe(401);
 
   const invalidLogin = await request.post('/api/login', {data: {password: 'senha-incorreta'}});
   expect(invalidLogin.status()).toBe(401);
@@ -286,7 +331,7 @@ test('painel e API administrativa permanecem protegidos', async ({page, request}
   await expect(page.locator('.loginLogo img')).toBeVisible();
 });
 
-test('painel autenticado funciona no celular', async ({page}) => {
+test('painel autenticado funciona no celular', async ({page}, testInfo) => {
   test.skip(!process.env.ADMIN_PASSWORD, 'ADMIN_PASSWORD não configurada para o teste autenticado.');
   await page.setViewportSize({width: 390, height: 844});
   await page.goto('/login');
@@ -297,13 +342,15 @@ test('painel autenticado funciona no celular', async ({page}) => {
     && response.request().method() === 'GET'
   ));
   await page.getByRole('button', {name: /acessar agenda/i}).click();
-  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page).toHaveURL(/\/admin$/, {timeout: 15_000});
   expect((await appointmentsResponse).status()).toBe(200);
 
   await expect(page.getByRole('heading', {name: 'Agenda da barbearia'})).toBeVisible();
   await expect(page.locator('.agendaMetrics article')).toHaveCount(4);
   await expectLocalImagesLoaded(page);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
+  expect((await page.request.post('/api/admin/appointments', {data: {}})).status()).toBe(400);
+  expect((await page.request.post('/api/admin/blocks', {data: {}})).status()).toBe(400);
 
   const currentDate = await page.locator('.agendaDatePicker input').inputValue();
   const nextResponse = page.waitForResponse((response) => (
@@ -320,8 +367,92 @@ test('painel autenticado funciona no celular', async ({page}) => {
   ));
   expect(filterHeights.every((height) => height >= 44)).toBeTruthy();
 
+  let manualAppointment: Record<string, unknown> | null = null;
+  await page.route('**/api/admin/appointments', async (route) => {
+    if (route.request().method() !== 'POST') return route.continue();
+    manualAppointment = route.request().postDataJSON();
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({ok: true, id: '00000000-0000-4000-8000-000000000001'}),
+    });
+  });
+  await page.getByRole('button', {name: /novo agendamento/i}).click();
+  const appointmentDialog = page.getByRole('dialog', {name: /adicionar à agenda/i});
+  await expect(appointmentDialog).toBeVisible();
+  await appointmentDialog.getByLabel('Nome do cliente').fill('Cliente do WhatsApp');
+  await appointmentDialog.getByLabel('WhatsApp').fill('51999999999');
+  await appointmentDialog.screenshot({path: testInfo.outputPath('admin-new-appointment.png')});
+  await appointmentDialog.getByRole('button', {name: /criar agendamento/i}).click();
+  await expect(appointmentDialog).toBeHidden();
+  await expect(page.getByText('Agendamento criado e horário reservado.')).toBeVisible();
+  expect(manualAppointment).toMatchObject({name: 'Cliente do WhatsApp', phone: '(51) 99999-9999'});
+
+  let manualBlock: Record<string, unknown> | null = null;
+  await page.route('**/api/admin/blocks', async (route) => {
+    if (route.request().method() !== 'POST') return route.continue();
+    manualBlock = route.request().postDataJSON();
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({ok: true, id: '00000000-0000-4000-8000-000000000002'}),
+    });
+  });
+  await page.getByRole('button', {name: /bloquear horário/i}).click();
+  const blockDialog = page.getByRole('dialog', {name: /bloquear agenda/i});
+  await expect(blockDialog).toBeVisible();
+  await blockDialog.getByLabel(/bloquear o dia inteiro/i).check();
+  await blockDialog.getByLabel(/motivo/i).fill('Folga');
+  await blockDialog.screenshot({path: testInfo.outputPath('admin-block-time.png')});
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
+  await blockDialog.getByRole('button', {name: /bloquear período/i}).click();
+  await expect(blockDialog).toBeHidden();
+  await expect(page.getByText('Período bloqueado na agenda.')).toBeVisible();
+  expect(manualBlock).toMatchObject({fullDay: true, reason: 'Folga'});
+  const adminLayout = await page.evaluate(() => {
+    const rect = (selector: string) => {
+      const bounds = document.querySelector(selector)?.getBoundingClientRect();
+      return bounds ? {x: bounds.x, width: bounds.width, right: bounds.right} : null;
+    };
+    return {
+      scrollX,
+      innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      main: rect('.agendaAdmin'),
+      aside: rect('.agendaAdmin > aside'),
+      content: rect('.agendaAdmin > section'),
+      overflowers: Array.from(document.querySelectorAll<HTMLElement>('body *'))
+        .map((element) => {
+          const bounds = element.getBoundingClientRect();
+          return {
+            element: `${element.tagName.toLowerCase()}.${element.className}`,
+            x: Math.round(bounds.x),
+            right: Math.round(bounds.right),
+            width: Math.round(bounds.width),
+          };
+        })
+        .filter(({x, right}) => x < -1 || right > window.innerWidth + 1)
+        .slice(0, 12),
+    };
+  });
+  await testInfo.attach('admin-mobile-layout', {
+    body: JSON.stringify(adminLayout, null, 2),
+    contentType: 'application/json',
+  });
+  expect(adminLayout.scrollX).toBe(0);
+  expect(adminLayout.main?.x || 0).toBeGreaterThanOrEqual(0);
+  expect(adminLayout.content?.x || 0).toBeGreaterThanOrEqual(0);
+  expect(adminLayout.main?.width || 0).toBeGreaterThanOrEqual(390);
+  expect(adminLayout.content?.width || 0).toBeGreaterThanOrEqual(350);
+  expect(adminLayout.overflowers).toEqual([]);
+  await page.screenshot({path: testInfo.outputPath('admin-mobile.png'), fullPage: true});
+
+  const logoutResponse = page.waitForResponse((response) => (
+    response.url().includes('/api/logout') && response.request().method() === 'POST'
+  ));
   await page.getByRole('button', {name: /sair/i}).click();
-  await expect(page).toHaveURL(/\/login$/);
+  expect((await logoutResponse).status()).toBe(200);
+  await expect(page).toHaveURL(/\/login$/, {timeout: 15_000});
   expect((await page.request.get('/api/admin/appointments')).status()).toBe(401);
 });
 
@@ -332,7 +463,7 @@ test('painel autenticado permanece organizado no desktop', async ({page}) => {
   await page.getByLabel('Senha de acesso').fill(process.env.ADMIN_PASSWORD || '');
   await page.getByRole('button', {name: /acessar agenda/i}).click();
 
-  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page).toHaveURL(/\/admin$/, {timeout: 15_000});
   await expect(page.locator('.agendaAdmin aside')).toBeVisible();
   await expect(page.getByRole('heading', {name: 'Agenda da barbearia'})).toBeVisible();
   await expect(page.locator('.agendaMetrics article')).toHaveCount(4);
