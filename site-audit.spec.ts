@@ -62,6 +62,8 @@ test('desktop: conteúdo, marca e responsividade base', async ({page}, testInfo)
   ).toContain('hero-campaign-v2.webp');
   await expect(page.locator('.siteHeader .brandmark img')).toBeVisible();
   await expect(page.locator('h1')).toContainText('Seu próximo corte');
+  await expect(page.locator('.teamGrid .barber')).toHaveCount(1);
+  await expect(page.getByText('Pablo', {exact: true})).toHaveCount(0);
 
   for (const id of ['servicos', 'equipe', 'portfolio', 'agendar', 'local']) {
     await page.locator(`#${id}`).scrollIntoViewIfNeeded();
@@ -242,7 +244,9 @@ test('agendamento: percorre as quatro etapas e valida os dados', async ({page}) 
 
   await page.locator('.choices button').first().click();
   await page.getByRole('button', {name: /continuar/i}).click();
-  await expect(page.getByRole('heading', {name: /escolha o profissional/i})).toBeVisible();
+  await expect(page.getByRole('heading', {name: /seu profissional/i})).toBeVisible();
+  await expect(page.locator('.barberChoices button')).toHaveCount(1);
+  await expect(page.locator('.barberChoices button')).toContainText('Vitinho OFC');
   await page.getByRole('button', {name: /continuar/i}).click();
   await expect(page.getByRole('heading', {name: /escolha dia e horário/i})).toBeVisible();
   await expect(page.locator('.slotLoading')).toBeHidden();
@@ -315,7 +319,7 @@ test('agendamento mantém o fluxo funcional no desktop', async ({page}, testInfo
     await expect(serviceButtons.nth(index)).toHaveAttribute('aria-pressed', 'true');
   }
   await page.getByRole('button', {name: /continuar/i}).click();
-  await expect(page.getByRole('heading', {name: /escolha o profissional/i})).toBeVisible();
+  await expect(page.getByRole('heading', {name: /seu profissional/i})).toBeVisible();
   await expectCardInView();
 
   const barberButtons = card.locator('.barberChoices button');
@@ -631,6 +635,12 @@ test('API rejeita datas impossíveis e horários fora da grade', async ({request
   const candidate = new Date();
   candidate.setDate(candidate.getDate() + 2);
   while (candidate.getDay() === 0) candidate.setDate(candidate.getDate() + 1);
+  const candidateDate = formatter.format(candidate);
+
+  const formerBarber = await request.get(
+    `/api/availability?date=${candidateDate}&barber=Pablo&service=social`,
+  );
+  expect(formerBarber.status()).toBe(404);
 
   const invalidSlot = await request.post('/api/appointments', {
     data: {
@@ -638,7 +648,7 @@ test('API rejeita datas impossíveis e horários fora da grade', async ({request
       phone: '51999999999',
       serviceId: 'social',
       barberName: 'Vitinho OFC',
-      date: formatter.format(candidate),
+      date: candidateDate,
       time: '09:17',
     },
   });

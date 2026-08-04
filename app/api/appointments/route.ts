@@ -134,7 +134,7 @@ export async function POST(request: Request) {
     const dayStart = new Date(`${body.date}T00:00:00-03:00`);
     const dayEnd = new Date(`${body.date}T23:59:59-03:00`);
     const [hoursResult, breaksResult, blockedResult] = await Promise.all([
-      db.from('working_hours').select('start_time,end_time').eq('barber_id', barber.id).eq('weekday', weekday).eq('active', true).maybeSingle(),
+      db.from('working_hours').select('start_time,end_time').eq('barber_id', barber.id).eq('weekday', weekday).eq('active', true).order('id', {ascending: false}).limit(1).maybeSingle(),
       db.from('breaks').select('start_time,end_time').eq('barber_id', barber.id).eq('weekday', weekday),
       db.from('blocked_times').select('start_datetime,end_datetime').eq('barber_id', barber.id).lt('start_datetime', dayEnd.toISOString()).gt('end_datetime', dayStart.toISOString()),
     ]);

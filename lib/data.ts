@@ -20,13 +20,6 @@ export const barbers = [
     note: 'Cortes modernos e transformações',
     description: 'Cortes atuais, degradês e transformações com acabamento preciso.',
   },
-  {
-    name: 'Pablo',
-    firstName: 'Pablo',
-    initials: 'P',
-    note: 'Corte personalizado e acabamento preciso',
-    description: 'Atendimento personalizado para deixar cada detalhe alinhado ao seu estilo.',
-  },
 ];
 export const whatsapp='5551989719243';
 export const address='Av. Leopoldo Wasun, 140, Santos Dumont, São Leopoldo – RS, 93115-380';

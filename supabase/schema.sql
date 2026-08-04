@@ -4,7 +4,7 @@ create table barbers(id uuid primary key default gen_random_uuid(),name text not
 alter table profiles add constraint profiles_barber_fk foreign key(barber_id) references barbers;
 create table services(id text primary key,name text not null,slug text unique not null,description text,price numeric(10,2) not null check(price>=0),duration_minutes int check(duration_minutes>0),image_url text,active boolean default true,created_at timestamptz default now(),updated_at timestamptz default now());
 create table barber_services(id bigint generated always as identity primary key,barber_id uuid references barbers on delete cascade,service_id text references services on delete cascade,unique(barber_id,service_id));
-create table working_hours(id bigint generated always as identity primary key,barber_id uuid references barbers on delete cascade,weekday int check(weekday between 0 and 6),start_time time not null,end_time time not null,active boolean default true,check(start_time<end_time));
+create table working_hours(id bigint generated always as identity primary key,barber_id uuid references barbers on delete cascade,weekday int check(weekday between 0 and 6),start_time time not null,end_time time not null,active boolean default true,unique(barber_id,weekday),check(start_time<end_time));
 create table breaks(id bigint generated always as identity primary key,barber_id uuid references barbers on delete cascade,weekday int check(weekday between 0 and 6),start_time time not null,end_time time not null);
 create table blocked_times(id uuid primary key default gen_random_uuid(),barber_id uuid references barbers on delete cascade,start_datetime timestamptz not null,end_datetime timestamptz not null,reason text,created_at timestamptz default now(),check(start_datetime<end_datetime));
 create table customers(id uuid primary key default gen_random_uuid(),name text not null,phone text unique not null,notes text,created_at timestamptz default now(),updated_at timestamptz default now());
@@ -20,8 +20,13 @@ create policy "admins manage barbers" on barbers for all using(exists(select 1 f
 create policy "admins manage services" on services for all using(exists(select 1 from profiles p where p.id=auth.uid() and p.role='admin'));
 create policy "staff read appointments" on appointments for select using(exists(select 1 from profiles p where p.id=auth.uid() and (p.role='admin' or p.barber_id=appointments.barber_id)));
 insert into barbers(name,slug,bio,specialties) values
-('Vitinho OFC','vitinho-ofc','Perfil oficial da Vitinho Barber.',array['degradê','navalhado','platinado']),
-('Pablo','pablo','Corte personalizado e acabamento preciso.',array['corte masculino','barba'])
-on conflict(slug) do update set name=excluded.name,bio=excluded.bio,specialties=excluded.specialties;
+('Vitinho OFC','vitinho-ofc','Perfil oficial da Vitinho Barber.',array['degradê','navalhado','platinado'])
+on conflict(slug) do update set name=excluded.name,bio=excluded.bio,specialties=excluded.specialties,active=true;
 insert into services(id,name,slug,description,price,duration_minutes) values ('navalhado','Corte navalhado','corte-navalhado','Acabamento preciso na navalha',35,60),('social','Corte social','corte-social','Clássico e versátil',30,60),('combo','Cabelo e barba','cabelo-barba','Visual completo',55,60),('barba','Barba','barba','Contorno e acabamento',25,60),('pezinho','Pezinho','pezinho','Manutenção rápida',15,30),('sobrancelha','Sobrancelha','sobrancelha','Acabamento natural',15,30),('pigmentacao','Pigmentação','pigmentacao','Definição sob medida',20,null),('luzes','Luzes','luzes','Tonalidade personalizada',140,null),('platinado','Platinado','platinado','Transformação completa',140,null);
-insert into barber_services(barber_id,service_id) select b.id,s.id from barbers b cross join services s where b.slug in('vitinho-ofc','pablo') on conflict do nothing;
+insert into barber_services(barber_id,service_id) select b.id,s.id from barbers b cross join services s where b.slug='vitinho-ofc' on conflict do nothing;
+insert into working_hours(barber_id,weekday,start_time,end_time,active)
+select b.id,h.weekday,h.start_time::time,h.end_time::time,true
+from barbers b
+cross join (values (1,'14:00','20:00'),(2,'09:00','20:00'),(3,'09:00','20:00'),(4,'09:00','20:00'),(5,'09:00','20:00'),(6,'09:00','20:00')) as h(weekday,start_time,end_time)
+where b.slug='vitinho-ofc'
+on conflict(barber_id,weekday) do update set start_time=excluded.start_time,end_time=excluded.end_time,active=true;

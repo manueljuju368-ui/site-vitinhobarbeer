@@ -238,6 +238,8 @@ header .brandmark,
 
 .teamGrid {
   max-width: 1040px;
+  grid-template-columns: minmax(0, 640px);
+  justify-content: center;
 }
 
 .barber {

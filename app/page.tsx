@@ -75,7 +75,7 @@ export default function Home() {
           <div className="eyebrow"><span /> SÃO LEOPOLDO • RS</div>
           <h1 id="hero-title">Seu próximo corte <em>começa aqui.</em></h1>
           <p>
-            Escolha o serviço, veja os horários livres e marque com Vitinho ou Pablo
+            Escolha o serviço, veja os horários livres e marque com o Vitinho
             em poucos passos.
           </p>
           <div className="actions">
@@ -88,7 +88,7 @@ export default function Home() {
           </div>
           <div className="heroProof" aria-label="Informações rápidas">
             <span><CalendarCheck /><b>Agenda online</b><small>Consulte em tempo real</small></span>
-            <span><Users /><b>2 profissionais</b><small>Escolha quem atende</small></span>
+            <span><Users /><b>Vitinho OFC</b><small>Atendimento exclusivo</small></span>
             <span><Scissors /><b>A partir de R$ 15</b><small>Valores transparentes</small></span>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function Home() {
           </p>
           <ol>
             <li><b>01</b><span>Escolha o serviço</span></li>
-            <li><b>02</b><span>Escolha o barbeiro</span></li>
+            <li><b>02</b><span>Atendimento com Vitinho</span></li>
             <li><b>03</b><span>Selecione dia e horário</span></li>
             <li><b>04</b><span>Informe nome e WhatsApp</span></li>
           </ol>
@@ -190,9 +190,9 @@ export default function Home() {
         <div className="sectionHead">
           <div>
             <span className="kicker">QUEM ATENDE</span>
-            <h2 id="team-title">Seu estilo,<br /><em>sua escolha.</em></h2>
+            <h2 id="team-title">Seu estilo,<br /><em>nas mãos certas.</em></h2>
           </div>
-          <p>Selecione o profissional no agendamento e consulte a disponibilidade.</p>
+          <p>Consulte a agenda do Vitinho e escolha o melhor horário para você.</p>
         </div>
         <div className="teamGrid">
           {barbers.map((barber, index) => (

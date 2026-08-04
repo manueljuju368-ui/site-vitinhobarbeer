@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
     const dayEnd = new Date(`${date}T23:59:59-03:00`);
     const [serviceResult, hoursResult, breaksResult, busyResult, blockedResult] = await Promise.all([
       db.from('services').select('duration_minutes').eq('id', serviceId).eq('active', true).single(),
-      db.from('working_hours').select('start_time,end_time').eq('barber_id', barber.id).eq('weekday', weekday).eq('active', true).maybeSingle(),
+      db.from('working_hours').select('start_time,end_time').eq('barber_id', barber.id).eq('weekday', weekday).eq('active', true).order('id', {ascending: false}).limit(1).maybeSingle(),
       db.from('breaks').select('start_time,end_time').eq('barber_id', barber.id).eq('weekday', weekday),
       db.from('appointments')
         .select('start_datetime,end_datetime')

@@ -228,7 +228,7 @@ export default function Booking() {
     );
   }
 
-  const stepLabels = ['Serviço', 'Barbeiro', 'Horário', 'Dados'];
+  const stepLabels = ['Serviço', 'Profissional', 'Horário', 'Dados'];
 
   return (
     <form className="bookingCard" id="agenda-online" noValidate onSubmit={(event) => {
@@ -283,7 +283,7 @@ export default function Booking() {
 
       {step === 2 && (
         <div>
-          <h3 tabIndex={-1}>Escolha o profissional</h3>
+          <h3 tabIndex={-1}>Seu profissional</h3>
           <div className="choices barberChoices" aria-label="Profissionais disponíveis">
             {barbers.map((entry) => (
               <button

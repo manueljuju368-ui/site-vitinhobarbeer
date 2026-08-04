@@ -46,6 +46,10 @@ Execute `supabase/schema.sql` no banco antes de habilitar `SUPABASE_SCHEMA_READY
 Em produção, uma configuração incompleta faz a agenda retornar indisponibilidade; ela
 não confirma reservas temporárias em memória.
 
+Em um banco que já estava em produção, execute
+`supabase/migrate-single-barber-smart-schedule.sql`. A migração desativa o Pablo sem
+apagar o histórico, elimina grades duplicadas e salva os horários semanais do Vitinho.
+
 ## Regras do agendamento
 
 - Reservas são aceitas com no mínimo uma hora de antecedência.
@@ -73,7 +77,7 @@ Confirme diretamente com a barbearia:
 
 - endereço exibido: `Av. Leopoldo Wasun, 140, Santos Dumont, São Leopoldo – RS, 93115-380`;
 - WhatsApp: `+55 51 98971-9243`;
-- horários de Vitinho OFC e Pablo;
+- horários de Vitinho OFC;
 - preços e disponibilidade dos serviços;
 - direito de uso das fotografias publicadas.
 
