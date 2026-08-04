@@ -57,7 +57,7 @@ export default function Home() {
         <picture className="heroPicture" aria-hidden="true">
           <source
             media="(max-width: 600px)"
-            srcSet="/portfolio-real-risco-v1.webp"
+            srcSet="/corte-degrade-v2.webp"
             type="image/webp"
           />
           <Image

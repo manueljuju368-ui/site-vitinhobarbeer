@@ -12,18 +12,19 @@ export default defineConfig({
   reporter: 'line',
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3010',
-    channel: 'chrome',
     locale: 'pt-BR',
     timezoneId: 'America/Sao_Paulo',
     trace: 'retain-on-failure',
   },
   webServer: {
     command: 'npm run dev -- --hostname 127.0.0.1 --port 3010',
-    url: 'http://127.0.0.1:3010/api/health',
+    // A interface deve iniciar mesmo quando o banco local não está configurado.
+    // A conexão com o banco continua coberta pelo teste dedicado de /api/health.
+    url: 'http://127.0.0.1:3010',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
   projects: [
-    {name: 'chrome', use: {...devices['Desktop Chrome'], channel: 'chrome'}},
+    {name: 'chromium', use: {...devices['Desktop Chrome']}},
   ],
 });

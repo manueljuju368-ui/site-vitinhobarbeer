@@ -86,7 +86,7 @@ export async function POST(request: Request) {
         && (startMinute - clockMinutes(defaultHours.start)) % step === 0;
 
       if (!withinHours) {
-        return NextResponse.json({error: 'Este horário está fora do expediente.'}, {status: 400});
+        return NextResponse.json({error: 'Escolha um dos horários exibidos na agenda.'}, {status: 400});
       }
 
       const conflict = demoAppointments.some((appointment) => {

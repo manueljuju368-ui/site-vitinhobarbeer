@@ -1,6 +1,18 @@
 import {expect, test, type Page} from '@playwright/test';
 import {isCalendarDate} from './lib/booking-date';
 
+const adminConfigured = Boolean(
+  process.env.ADMIN_PASSWORD
+  && process.env.ADMIN_SESSION_SECRET
+  && process.env.ADMIN_SESSION_SECRET.length >= 32,
+);
+const databaseConfigured = Boolean(
+  process.env.SUPABASE_SCHEMA_READY === 'true'
+  && process.env.NEXT_PUBLIC_SUPABASE_URL
+  && process.env.SUPABASE_SERVICE_ROLE_KEY,
+);
+const adminIntegrationConfigured = adminConfigured && databaseConfigured;
+
 async function expectLocalImagesLoaded(page: Page) {
   const images = page.locator('img');
 
@@ -68,7 +80,8 @@ test('mobile: sem vazamento e com chamada fixa', async ({page}, testInfo) => {
   await expect(page.locator('.floatingWa')).toBeHidden();
   await expect.poll(
     () => page.locator('.heroMedia').evaluate((element) => (element as HTMLImageElement).currentSrc),
-  ).toContain('portfolio-real-risco-v1.webp');
+  ).toContain('corte-degrade-v2.webp');
+  await page.screenshot({path: testInfo.outputPath('mobile-hero.png'), fullPage: false});
 
   for (const id of ['inicio', 'servicos', 'equipe', 'portfolio', 'agendar', 'local']) {
     await page.locator(`#${id}`).scrollIntoViewIfNeeded();
@@ -97,6 +110,68 @@ test('mobile: sem vazamento e com chamada fixa', async ({page}, testInfo) => {
 
   await page.waitForTimeout(800);
   await page.screenshot({path: testInfo.outputPath('mobile-full.png'), fullPage: true});
+});
+
+test('mobile: links e botões estão íntegros e não ficam cobertos', async ({page}) => {
+  test.setTimeout(60_000);
+  await page.setViewportSize({width: 390, height: 844});
+  await page.emulateMedia({reducedMotion: 'reduce'});
+  await page.goto('/');
+
+  const links = await page.locator('a[href]').evaluateAll((elements) => elements.map((element) => ({
+    href: element.getAttribute('href') || '',
+    label: (element.getAttribute('aria-label') || element.textContent || '').trim(),
+  })));
+
+  expect(links.length).toBeGreaterThan(0);
+  expect(links.filter(({href, label}) => !href || !label)).toEqual([]);
+
+  for (const {href} of links) {
+    if (href.startsWith('#')) {
+      expect(await page.locator(href).count()).toBe(1);
+      continue;
+    }
+    if (href.startsWith('/')) continue;
+
+    const url = new URL(href);
+    expect(url.protocol).toBe('https:');
+  }
+
+  const controls = page.locator('a[href]:visible:not(.skipLink), button:visible:not([disabled])');
+  const undersized: Array<{label: string; width: number; height: number}> = [];
+  for (let index = 0; index < await controls.count(); index += 1) {
+    const control = controls.nth(index);
+    const result = await control.evaluate((element) => {
+      const bounds = element.getBoundingClientRect();
+      return {
+        label: (element.getAttribute('aria-label') || element.textContent || '').trim(),
+        width: bounds.width,
+        height: bounds.height,
+      };
+    });
+    if (result.width < 44 || result.height < 44) undersized.push(result);
+  }
+  expect(undersized).toEqual([]);
+
+  await page.setViewportSize({width: 1440, height: 900});
+  for (const hash of ['#agendar', '#servicos', '#portfolio', '#equipe', '#local']) {
+    await page.goto('/');
+    const link = page.locator(`a[href="${hash}"]:visible`).first();
+    await link.click();
+    await expect(page).toHaveURL(new RegExp(`${hash}$`));
+    const target = page.locator(hash);
+    await expect(target).toBeVisible();
+  }
+
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/');
+  await page.locator('footer').scrollIntoViewIfNeeded();
+  const footerLast = page.locator('footer > small');
+  const fixedCta = page.locator('.mobileBook');
+  const [footerBox, ctaBox] = await Promise.all([footerLast.boundingBox(), fixedCta.boundingBox()]);
+  expect(footerBox).not.toBeNull();
+  expect(ctaBox).not.toBeNull();
+  expect((footerBox?.y || 0) + (footerBox?.height || 0)).toBeLessThan(ctaBox?.y || 0);
 });
 
 test('mobile compacto: imagens e conteúdo cabem em 320px', async ({page}) => {
@@ -321,7 +396,7 @@ test('painel e API administrativa permanecem protegidos', async ({page, request}
   expect((await request.post('/api/admin/blocks', {data: {}})).status()).toBe(401);
 
   const invalidLogin = await request.post('/api/login', {data: {password: 'senha-incorreta'}});
-  expect(invalidLogin.status()).toBe(401);
+  expect(invalidLogin.status()).toBe(adminConfigured ? 401 : 503);
   expect(invalidLogin.headers()['set-cookie']).toBeUndefined();
 
   const response = await page.goto('/admin');
@@ -332,7 +407,7 @@ test('painel e API administrativa permanecem protegidos', async ({page, request}
 });
 
 test('painel autenticado funciona no celular', async ({page}, testInfo) => {
-  test.skip(!process.env.ADMIN_PASSWORD, 'ADMIN_PASSWORD não configurada para o teste autenticado.');
+  test.skip(!adminIntegrationConfigured, 'Painel e banco não configurados para o teste autenticado.');
   await page.setViewportSize({width: 390, height: 844});
   await page.goto('/login');
   await page.getByLabel('Senha de acesso').fill(process.env.ADMIN_PASSWORD || '');
@@ -457,7 +532,7 @@ test('painel autenticado funciona no celular', async ({page}, testInfo) => {
 });
 
 test('painel autenticado permanece organizado no desktop', async ({page}) => {
-  test.skip(!process.env.ADMIN_PASSWORD, 'ADMIN_PASSWORD não configurada para o teste autenticado.');
+  test.skip(!adminIntegrationConfigured, 'Painel e banco não configurados para o teste autenticado.');
   await page.setViewportSize({width: 1440, height: 1000});
   await page.goto('/login');
   await page.getByLabel('Senha de acesso').fill(process.env.ADMIN_PASSWORD || '');
@@ -513,8 +588,10 @@ test('compartilhamento social usa a capa com a logo oficial', async ({page, requ
 
 test('saúde da aplicação confirma o banco', async ({request}) => {
   const response = await request.get('/api/health');
-  expect(response.status()).toBe(200);
-  await expect(response.json()).resolves.toMatchObject({status: 'ok', database: true});
+  expect(response.status()).toBe(databaseConfigured ? 200 : 503);
+  await expect(response.json()).resolves.toMatchObject(databaseConfigured
+    ? {status: 'ok', database: true}
+    : {status: 'degraded', database: false});
 });
 
 test('API rejeita datas impossíveis e horários fora da grade', async ({request}) => {

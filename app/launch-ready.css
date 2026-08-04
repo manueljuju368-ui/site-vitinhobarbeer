@@ -886,6 +886,15 @@ body {
     min-height: 45px;
   }
 
+  .bookingHelp a {
+    justify-content: center;
+    min-width: 44px;
+  }
+
+  footer .brand {
+    min-height: 44px;
+  }
+
   .siteHeader .brand {
     min-height: 52px;
   }

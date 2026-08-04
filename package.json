@@ -37,7 +37,8 @@
   "overrides": {
     "@node-minify/core": "8.0.5",
     "@node-minify/terser": "8.0.5",
-    "postcss": "8.5.18",
-    "sharp": "0.35.3"
+    "postcss": "8.5.25",
+    "sharp": "0.35.3",
+    "undici": "7.29.0"
   }
 }
