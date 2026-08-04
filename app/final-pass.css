@@ -286,6 +286,10 @@ header .brandmark,
   scroll-margin-top: 104px;
 }
 
+#agenda-online {
+  scroll-margin-top: 104px;
+}
+
 .bookingIntro,
 .bookingCard > div,
 .dateChoices,
@@ -416,6 +420,7 @@ header .brandmark,
   #equipe,
   #portfolio,
   #agendar,
+  #agenda-online,
   #local {
     scroll-margin-top: 70px;
   }

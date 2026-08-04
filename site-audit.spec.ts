@@ -172,6 +172,13 @@ test('mobile: links e botões estão íntegros e não ficam cobertos', async ({p
   expect(footerBox).not.toBeNull();
   expect(ctaBox).not.toBeNull();
   expect((footerBox?.y || 0) + (footerBox?.height || 0)).toBeLessThan(ctaBox?.y || 0);
+
+  await fixedCta.click();
+  await expect(page).toHaveURL(/#agenda-online$/);
+  await expect.poll(async () => {
+    const bounds = await page.locator('#agenda-online').boundingBox();
+    return Boolean(bounds && bounds.y >= 60 && bounds.y < 180);
+  }).toBeTruthy();
 });
 
 test('mobile compacto: imagens e conteúdo cabem em 320px', async ({page}) => {
@@ -590,8 +597,20 @@ test('saúde da aplicação confirma o banco', async ({request}) => {
   const response = await request.get('/api/health');
   expect(response.status()).toBe(databaseConfigured ? 200 : 503);
   await expect(response.json()).resolves.toMatchObject(databaseConfigured
-    ? {status: 'ok', database: true}
-    : {status: 'degraded', database: false});
+    ? {
+        status: 'ok',
+        database: true,
+        checks: {
+          barbers: true,
+          services: true,
+          customers: true,
+          appointments: true,
+          workingHours: true,
+          breaks: true,
+          blockedTimes: true,
+        },
+      }
+    : {status: 'degraded', database: false, checks: {configuration: false}});
 });
 
 test('API rejeita datas impossíveis e horários fora da grade', async ({request}) => {

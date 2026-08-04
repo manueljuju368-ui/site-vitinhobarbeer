@@ -77,7 +77,7 @@ const formatPhone = (value: string) => {
 };
 
 const showBookingTop = () => requestAnimationFrame(() => requestAnimationFrame(() => {
-  const card = document.querySelector<HTMLElement>('#agendar .bookingCard');
+  const card = document.querySelector<HTMLElement>('#agenda-online');
   if (!card) return;
   card.querySelector<HTMLElement>('h3')?.focus({preventScroll: true});
   const top = window.scrollY + card.getBoundingClientRect().top - 104;
@@ -211,7 +211,7 @@ export default function Booking() {
       `Olá, agendei um horário pelo site da Vitinho Barber.\n\nNome: ${cleanName}\nServiço: ${item?.name}\nProfissional: ${barber}\nData: ${longDate(date)}\nHorário: ${time}\n\nGostaria de confirmar meu agendamento.`,
     );
     return (
-      <div className="bookingCard success" role="status">
+      <div className="bookingCard success" id="agenda-online" role="status">
         <div className="successIcon"><Check /></div>
         <small>SOLICITAÇÃO REGISTRADA</small>
         <h3 tabIndex={-1}>Seu horário está reservado!</h3>
@@ -231,7 +231,7 @@ export default function Booking() {
   const stepLabels = ['Serviço', 'Barbeiro', 'Horário', 'Dados'];
 
   return (
-    <form className="bookingCard" noValidate onSubmit={(event) => {
+    <form className="bookingCard" id="agenda-online" noValidate onSubmit={(event) => {
       event.preventDefault();
       if (step === 4) confirm();
     }}>

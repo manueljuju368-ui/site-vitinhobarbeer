@@ -174,7 +174,12 @@ export async function POST(request: Request) {
       .upsert({name: body.name, phone: normalizePhone(body.phone)}, {onConflict: 'phone'})
       .select('id')
       .single();
-    if (customerError) throw customerError;
+    if (customerError || !customer) {
+      return NextResponse.json(
+        {error: 'Não foi possível salvar seus dados agora. Tente novamente.'},
+        {status: 503},
+      );
+    }
 
     const {error} = await db.from('appointments').insert({
       customer_id: customer.id,
@@ -186,15 +191,22 @@ export async function POST(request: Request) {
       price: service.price,
     });
     if (error) {
+      const conflict = error.code === '23P01';
       return NextResponse.json({
-        error: error.code === '23P01'
+        error: conflict
           ? 'Este horário acabou de ser reservado. Escolha outro.'
-          : 'Não foi possível reservar.',
-      }, {status: 409});
+          : 'O banco não conseguiu registrar o agendamento. Tente novamente.',
+      }, {status: conflict ? 409 : 503});
     }
 
     return NextResponse.json({ok: true});
-  } catch {
-    return NextResponse.json({error: 'Confira os dados informados.'}, {status: 400});
+  } catch (error) {
+    if (error instanceof z.ZodError || error instanceof SyntaxError) {
+      return NextResponse.json({error: 'Confira os dados informados.'}, {status: 400});
+    }
+    return NextResponse.json(
+      {error: 'A agenda não conseguiu acessar o banco agora. Tente novamente.'},
+      {status: 503},
+    );
   }
 }

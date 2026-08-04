@@ -48,7 +48,7 @@ export default function Home() {
           <a href="#equipe">Equipe</a>
           <a href="#local">Endereço</a>
         </nav>
-        <a className="btn gold headerCta" href="#agendar">
+        <a className="btn gold headerCta" href="#agenda-online">
           <CalendarDays /> Agendar horário
         </a>
       </header>
@@ -79,7 +79,7 @@ export default function Home() {
             em poucos passos.
           </p>
           <div className="actions">
-            <a className="btn gold heroPrimary" href="#agendar">
+            <a className="btn gold heroPrimary" href="#agenda-online">
               Escolher meu horário <ArrowRight />
             </a>
             <a className="btn ghost" href="#portfolio">
@@ -144,7 +144,7 @@ export default function Home() {
         <div className="serviceGrid">
           {services.map((service, index) => {
             const bookable = service.duration !== null;
-            const href = bookable ? '#agendar' : consultationUrl;
+            const href = bookable ? '#agenda-online' : consultationUrl;
             return (
               <article className="service" key={service.id}>
                 <span>{String(index + 1).padStart(2, '0')}</span>
@@ -201,7 +201,7 @@ export default function Home() {
               <span>BARBEIRO</span>
               <h3>{barber.name}</h3>
               <p>{barber.description}</p>
-              <a href="#agendar">Ver agenda do {barber.firstName} <ArrowRight /></a>
+              <a href="#agenda-online">Ver agenda do {barber.firstName} <ArrowRight /></a>
             </article>
           ))}
         </div>
@@ -262,7 +262,7 @@ export default function Home() {
       >
         <MessageCircle />
       </a>
-      <a className="mobileBook" href="#agendar"><CalendarDays /> Escolher meu horário</a>
+      <a className="mobileBook" href="#agenda-online"><CalendarDays /> Escolher meu horário</a>
     </main>
   );
 }
